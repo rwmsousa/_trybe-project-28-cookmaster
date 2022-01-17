@@ -22,8 +22,16 @@ const findUserByEmailModel = async (email) => {
     const findUser = await db.collection('users')
         .findOne({ email });
     
-    console.log('FINDUSER', findUser);
     return findUser;
+}
+
+const verifyUsersModel = async (email, password) => {
+    const db = await connect();
+    
+    const findUser = await db.collection('users')
+        .findOne({$and: [{ email }, { password }]});
+    
+   return findUser;
 }
 
 // const existsVerifyName = async (name) => {

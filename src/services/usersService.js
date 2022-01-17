@@ -12,17 +12,31 @@ const createUserService = async (user) => {
     const { email, password, name } = user;
     
     const { error } = userSchema.validate({ email, password, name });
-
     if (error) { throw errorConstructor(400, 'Invalid entries. Try again.'); }
 
     const userExists = await usersModel.findUserByEmailModel(email);
-    console.log('USEREXISTS', userExists);
     if (userExists) { throw errorConstructor(409, 'Email already registered'); }
     
     const newUser = await usersModel.createUserModel( user );
 
     return newUser;
 };
+
+const loginSchema = Joi.object({
+    email: Joi.string().regex(/\S+@\S+\.\S+/).required(),
+    password: Joi.string().required(),
+});
+
+const loginService = async (login) => {
+
+    const { error } = loginSchema.validate(login);
+    if (error) { throw errorConstructor(401, 'All fields must be filled'); }
+    
+    const token = await usersModel.findUserByEmailModel(login.email);
+    if(!token) { throw errorConstructor(401, 'Incorrect username or password'); }
+    console.log(token);
+    return token;
+}
 
 // const getUsersService = async () => {
 //     const users = await usersModel.getUsersModel();
@@ -66,6 +80,7 @@ const createUserService = async (user) => {
 
 module.exports = {
     createUserService,
+    loginService,
     // getUsersService,
     // getUserIdService,
     // updateUserService,
