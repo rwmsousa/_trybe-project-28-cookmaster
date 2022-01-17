@@ -1,70 +1,81 @@
-const { ObjectId } = require('mongodb');
+// const { ObjectId } = require('mongodb');
 const connect = require('./connection');
 
-const existsVerifyName = async (name) => {
-    const db = await connect();
-
-    const userExists = await db.collection('users')
-        .findOne({ name });
-
-    return userExists;
-};
-
-const createUserModel = async (name, quantity) => {
+const createUserModel = async (user) => {
     const db = await connect();
 
     const userInserted = await db.collection('users')
-        .insertOne({ name, quantity })
+        .insertOne(user)
         .then((result) => ({
+            name: result.ops[ 0 ].name,
+            email: result.ops[ 0 ].email,
+            role: result.ops[ 0 ].role,
             _id: result.insertedId,
-            name,
-            quantity,
         }));
 
     return userInserted;
 };
 
-const getUsersModel = async () => {
-    const db = await connect();
-    const users = await db.collection('users').find().toArray();
-    console.log(users);
-    return users;
-};
-
-const getUserIdModel = async (id) => {
-    // https: //mongodb.github.io/node-mongodb-native/api-bson-generated/objectid.html#objectid-isvalid
-    // https: //mongodb.github.io/node-mongodb-native/2.2/api/ObjectID.html
-    if (!ObjectId.isValid(id)) return null;
-
-    const db = await connect();
-    const user = await db.collection('users').findOne({ _id: ObjectId(id) });
-
-    return user;
-};
-
-const updateUserModel = async (id, name, quantity) => {
+const findUserByEmailModel = async (email) => {
     const db = await connect();
 
-    await db.collection('users')
-        .updateOne({ _id: ObjectId(id) }, { $set: { name, quantity } });
+    const findUser = await db.collection('users')
+        .findOne({ email });
+    
+    console.log('FINDUSER', findUser);
+    return findUser;
+}
 
-    return getUserIdModel(id);
-};
+// const existsVerifyName = async (name) => {
+//     const db = await connect();
 
-const deleteUserModel = async (id) => {
-    const db = await connect();
-    const response = await db.collection('users').deleteOne({ _id: ObjectId(id) });
+//     const userExists = await db.collection('users')
+//         .findOne({ name });
 
-    return response;
-};
+//     return userExists;
+// };
+
+// const getUsersModel = async () => {
+//     const db = await connect();
+//     const users = await db.collection('users').find().toArray();
+//     return users;
+// };
+
+// const getUserIdModel = async (id) => {
+//     // https: //mongodb.github.io/node-mongodb-native/api-bson-generated/objectid.html#objectid-isvalid
+//     // https: //mongodb.github.io/node-mongodb-native/2.2/api/ObjectID.html
+//     if (!ObjectId.isValid(id)) return null;
+
+//     const db = await connect();
+//     const user = await db.collection('users').findOne({ _id: ObjectId(id) });
+
+//     return user;
+// };
+
+// const updateUserModel = async (id, name, quantity) => {
+//     const db = await connect();
+
+//     await db.collection('users')
+//         .updateOne({ _id: ObjectId(id) }, { $set: { name, quantity } });
+
+//     return getUserIdModel(id);
+// };
+
+// const deleteUserModel = async (id) => {
+//     const db = await connect();
+//     const response = await db.collection('users').deleteOne({ _id: ObjectId(id) });
+
+//     return response;
+// };
 
 module.exports = {
     createUserModel,
-    existsVerifyName,
-    getUsersModel,
-    getUserIdModel,
-    updateUserModel,
-    deleteUserModel,
+    findUserByEmailModel,
+    // existsVerifyName,
+    // getUsersModel,
+    // getUserIdModel,
+    // updateUserModel,
+    // deleteUserModel,
 };
 
 // SQL: Busca todos os autores do banco.

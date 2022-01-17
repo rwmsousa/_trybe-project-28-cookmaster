@@ -11,7 +11,6 @@ const createRecipeController = async (req, res, next) => {
         return res.status(created).json({ recipe });
 
     } catch (err) {
-        console.log('erro CONTROLLER', err)
         return next(err);
     }
 };

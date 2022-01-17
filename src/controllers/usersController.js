@@ -1,15 +1,14 @@
 const usersService = require('../services/usersService');
-const { created, success } = require('../utils/dictionary/statusCode');
 
 const createUserController = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
-
+        const role = 'user'
         const user = await usersService
-            .createUserService({ email, password, name, role: 'user' });
+            .createUserService({ email, password, name, role });
 
-        return res.status(created).json(user);
-        
+        return res.status(201).json({user});
+
     } catch (err) {
         return next(err);
     }
@@ -18,11 +17,11 @@ const createUserController = async (req, res, next) => {
 const loginController = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        
+
         const token = await usersService.loginService({ email, password });
-        
+
         return res.status(success).json(token);
-        
+
     } catch (err) {
 
         return next(err);
@@ -76,7 +75,7 @@ const loginController = async (req, res, next) => {
 module.exports = {
     createUserController,
     loginController,
-    
+
     // getUsersController,
     // getUserIdController,
     // updateUserController,
