@@ -8,9 +8,9 @@ const createRecipeModel = async (recipeData, user) => {
     const recipeInserted = await db.collection('recipes')
         .insertOne(recipeData)
         .then((result) => ({
-            name: result.ops[ 0 ].name,
-            ingredients: result.ops[ 0 ].ingredients,
-            preparation: result.ops[ 0 ].preparation,
+            name: result.ops[0].name,
+            ingredients: result.ops[0].ingredients,
+            preparation: result.ops[0].preparation,
             userId: _id,
             _id: result.insertedId,
         }));
@@ -41,15 +41,13 @@ const updateRecipeModel = async (idRecipe, changesRecipes, userId) => {
     const db = await connect();
     const { name, ingredients, preparation } = changesRecipes;
 
-
     await db.collection('recipes')
         .updateOne({
             _id: ObjectId(idRecipe),
-        }, { $set: { name, ingredients, preparation} });
+        }, { $set: { name, ingredients, preparation } });
 
     const recipeUpdated = await db.collection('recipes').findOne({ _id: ObjectId(idRecipe) });
     recipeUpdated.userId = userId;
-    console.log('recipeUpdated', recipeUpdated);
 
     return recipeUpdated;
 };

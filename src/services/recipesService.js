@@ -46,10 +46,11 @@ const updateRecipeService = async (userEmail, idRecipe, changesRecipes) => {
     if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
 
     const verifyUser = await usersModel.findUserByEmailModel(userEmail);
-    console.log('verifyUser', verifyUser);
     if (!verifyUser) { throw errorConstructor(422, 'User not exists'); }
 
-    const updatedRecipe = await recipesModel.updateRecipeModel(idRecipe, changesRecipes, verifyUser._id);
+    const { _id } = verifyUser;
+    const updatedRecipe = await recipesModel
+        .updateRecipeModel(idRecipe, changesRecipes, _id);
 
     return updatedRecipe;
 };

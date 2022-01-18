@@ -42,7 +42,6 @@ const updateRecipeController = async (req, res, next) => {
         const updatedRecipe = await recipesService.updateRecipeService(user.email, id, req.body);
 
         return res.status(200).json(updatedRecipe);
-
     } catch (err) {
         return next(err);
     }
