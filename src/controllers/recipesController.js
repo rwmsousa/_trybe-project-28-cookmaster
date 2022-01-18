@@ -1,12 +1,14 @@
 const recipesService = require('../services/recipesService');
 const { created } = require('../utils/dictionary/statusCode');
+const { auth } = require('../middlewares/auth');
 
 const createRecipeController = async (req, res, next) => {
     try {
         const recipeData = req.body;
-        const userId = req.user._id;
+        
+        const user = req.user;   
 
-        const recipe = await recipesService.createRecipeService(recipeData, userId);
+        const recipe = await recipesService.createRecipeService(recipeData, user);
 
         return res.status(created).json({ recipe });
 

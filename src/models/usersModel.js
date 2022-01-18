@@ -1,5 +1,8 @@
 // const { ObjectId } = require('mongodb');
 const connect = require('./connection');
+const jwt = require('jsonwebtoken');
+
+const { JWT_SECRET } = process.env || 'secret';
 
 const createUserModel = async (user) => {
     const db = await connect();
@@ -19,19 +22,32 @@ const createUserModel = async (user) => {
 const findUserByEmailModel = async (email) => {
     const db = await connect();
 
-    const findUser = await db.collection('users')
+    const user = await db.collection('users')
         .findOne({ email });
     
-    return findUser;
+    return user;
 }
 
 const verifyUsersModel = async (email, password) => {
     const db = await connect();
     
-    const findUser = await db.collection('users')
-        .findOne({$and: [{ email }, { password }]});
+    const user = await db.collection('users')
+        .findOne({ $and: [ { email }, { password } ] },
+            { projection: {  name: 1, email: 1, role: 1, _id: 1} });
+   return {user};
+}
+
+const tokenGenerateModel = async (login) => {
+    const db = await connect();
+   
+    const {user} = await verifyUsersModel( login.email, login.password );
+
+    if (!user) return null;
+
+    const token = jwt.sign(user, JWT_SECRET);
+
+    return token;
     
-   return findUser;
 }
 
 // const existsVerifyName = async (name) => {
@@ -79,6 +95,8 @@ const verifyUsersModel = async (email, password) => {
 module.exports = {
     createUserModel,
     findUserByEmailModel,
+    verifyUsersModel,
+    tokenGenerateModel
     // existsVerifyName,
     // getUsersModel,
     // getUserIdModel,

@@ -1,4 +1,7 @@
 const express = require('express');
+
+const auth  = require('../middlewares/auth');
+
 const {
     createUserController,
     loginController,
@@ -27,7 +30,7 @@ router.post('/login', loginController);
 // router.delete('/users/:id', deleteUserController);
 
 // recipes
-router.post('/recipes', createRecipeController);
+router.post('/recipes', auth, createRecipeController);
 // router.get('/recipes', getRecipesController);
 // router.get('/recipes/:id', getRecipeIdController);
 // router.put('/recipes/:id', updateRecipeController);

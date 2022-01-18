@@ -23,7 +23,7 @@ const createUserService = async (user) => {
 };
 
 const loginSchema = Joi.object({
-    email: Joi.string().regex(/\S+@\S+\.\S+/).required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required(),
 });
 
@@ -32,9 +32,9 @@ const loginService = async (login) => {
     const { error } = loginSchema.validate(login);
     if (error) { throw errorConstructor(401, 'All fields must be filled'); }
     
-    const token = await usersModel.findUserByEmailModel(login.email);
+    const token = await usersModel.tokenGenerateModel(login);
     if(!token) { throw errorConstructor(401, 'Incorrect username or password'); }
-    console.log(token);
+
     return token;
 }
 

@@ -1,23 +1,18 @@
 const { ObjectId } = require('mongodb');
 const connect = require('./connection');
 
-const createRecipeModel = async (itensSold) => {
+const createRecipeModel = async (recipeData, user) => {
     const db = await connect();
-    const itens = { itensSold };
 
     const recipeInserted = await db.collection('recipes')
-        .insertOne({ itensSold })
+        .insertOne(recipeData)
         .then((result) => ({
+            name: result.ops[ 0 ].name,
+            ingredients: result.ops[ 0 ].ingredients,
+            preparation: result.ops[ 0 ].preparation,
+            userId: user._id,
             _id: result.insertedId,
-            itensSold,
         }));
-
-    await db.collection('users')
-        .updateOne({ _id: ObjectId(itens.itensSold[0].userId) }, {
-            $inc: {
-                quantity: itens.itensSold[0].quantity * -1,
-            },
-        });
 
     return recipeInserted;
 };

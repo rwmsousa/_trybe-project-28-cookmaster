@@ -2,31 +2,22 @@ const Joi = require('joi');
 const recipesModel = require('../models/recipesModel');
 const usersModel = require('../models/usersModel');
 const errorConstructor = require('../utils/errorConstructor');
-const { notFound, unprocessableEntity } = require('../utils/dictionary/statusCode');
 
-const userSchema = Joi.object({
-    quantity: Joi.number().min(1).required(),
+const recipeSchema = Joi.object({
+    name: Joi.string().required(),
+    ingredients: Joi.string().required(),
+    preparation: Joi.string().required(),
 });
 
-const createRecipeService = async (itensSold) => {
-    const verifyUsers = itensSold.some((recipe) =>
-        usersModel.getUserIdModel(recipe.userId));
+const createRecipeService = async (recipeData, user) => {
 
-    if (!verifyUsers) {
-        throw errorConstructor(unprocessableEntity, 'User not exists');
-    }
+    const { error } = recipeSchema.validate(recipeData);
+    if (error) { throw errorConstructor(400, 'Invalid entries. Try again.'); }
+    
+    const verifyUsers = await usersModel.findUserByEmailModel(user.email);
+    if (!verifyUsers) { throw errorConstructor(422, 'User not exists'); }
 
-    await verifyStock(itensSold);
-
-    for (let index = 0; index < itensSold.length; index += 1) {
-        const recipe = { quantity: itensSold[index].quantity };
-        const { error } = userSchema.validate(recipe);
-        if (error) {
-            throw errorConstructor(unprocessableEntity, 'Wrong user ID or invalid quantity');
-        }
-    }
-
-    const newRecipe = await recipesModel.createRecipeModel(itensSold);
+    const newRecipe = await recipesModel.createRecipeModel(recipeData, user);
 
     return newRecipe;
 };
