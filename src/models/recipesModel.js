@@ -6,14 +6,8 @@ const createRecipeModel = async (recipeData, user) => {
     const { _id } = user;
 
     const recipeInserted = await db.collection('recipes')
-        .insertOne(recipeData)
-        .then((result) => ({
-            name: result.ops[0].name,
-            ingredients: result.ops[0].ingredients,
-            preparation: result.ops[0].preparation,
-            userId: _id,
-            _id: result.insertedId,
-        }));
+        .insertOne({...recipeData, userId: _id})
+        .then((result) => result.ops[0])
 
     return recipeInserted;
 };
@@ -52,27 +46,20 @@ const updateRecipeModel = async (idRecipe, changesRecipes, userId) => {
     return recipeUpdated;
 };
 
-// const deleteRecipeModel = async (id, itensSold) => {
-//     const db = await connect();
+const deleteRecipeModel = async (idRecipe) => {
+    const db = await connect();
 
-//     await db.collection('users')
-//         .updateOne({ _id: ObjectId(itensSold[0].userId) }, {
-//             $inc: {
-//                 quantity: itensSold[0].quantity,
-//             },
-//         });
+    const recipeDeleted = await db.collection('recipes').deleteOne({ _id: ObjectId(idRecipe) });
 
-//     await db.collection('recipes').deleteOne({ _id: ObjectId(id) });
-//     const recipe = getRecipeIdModel(id);
-//     return recipe;
-// };
+    return recipeDeleted;
+};
 
 module.exports = {
     createRecipeModel,
     getRecipesModel,
     getRecipeIdModel,
     updateRecipeModel,
-    // deleteRecipeModel,
+    deleteRecipeModel,
 };
 
 // SQL: Busca todos os autores do banco.
