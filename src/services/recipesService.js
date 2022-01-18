@@ -25,11 +25,11 @@ const createRecipeService = async (recipeData, user) => {
 const getRecipesService = async () => {
 
     const recipes = await recipesModel.getRecipesModel();
-    console.log('RECIPES SERVICE', recipes);
+
     if (recipes.length === 0) {
         throw errorConstructor(422, 'List recipes empty');
     }
-console.log('passou do if services');
+
     return recipes;
 };
 
