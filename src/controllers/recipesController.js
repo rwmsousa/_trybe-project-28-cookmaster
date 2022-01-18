@@ -2,9 +2,9 @@ const recipesService = require('../services/recipesService');
 
 const createRecipeController = async (req, res, next) => {
     try {
-        const recipeData = req.body; // Recipe
-        
-        const { _id } = req.user; // req.user is the user that is logged in
+        const recipeData = req.body;
+
+        const { user } = req;
 
         const recipe = await recipesService.createRecipeService(recipeData, _id);
 
@@ -36,9 +36,9 @@ const getRecipeIdController = async (req, res, next) => {
 
 const updateRecipeController = async (req, res, next) => {
     try {
-        const { user } = req;  
+        const { user } = req;
         const { id } = req.params;
-        
+
         const updatedRecipe = await recipesService.updateRecipeService(user.email, id, req.body);
 
         return res.status(200).json(updatedRecipe);
@@ -48,11 +48,14 @@ const updateRecipeController = async (req, res, next) => {
 };
 
 const deleteRecipeController = async (req, res, next) => {
-    const { id } = req.params;
-
     try {
-        const deleteRecipe = await recipesService.deleteRecipeService(id);
-        return res.status(200).json(deleteRecipe);
+        const { user } = req;
+        const { id } = req.params;
+        
+        const recipeDeleted = await recipesService.deleteRecipeService(id, user);
+
+        return res.status(204).json(recipeDeleted);
+        
     } catch (err) {
         return next(err);
     }

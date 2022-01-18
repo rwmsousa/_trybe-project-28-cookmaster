@@ -55,16 +55,17 @@ const updateRecipeService = async (userEmail, idRecipe, changesRecipes) => {
     return updatedRecipe;
 };
 
-const deleteRecipeService = async (id) => {
-    const searchRecipe = await recipesModel.getRecipeIdModel(id);
-    if (!searchRecipe) {
-        throw errorConstructor(404, 'Wrong recipe ID format');
-    }
+const deleteRecipeService = async (idRecipe, user) => {
+    const exists = await recipesModel.getRecipeIdModel(idRecipe);
+    if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
 
-    const deletedRecipe = await recipesModel.deleteRecipeModel(id);
-    if (deletedRecipe) { throw errorConstructor(404, 'Recipe not deleted'); }
+    const verifyUser = await usersModel.findUserByEmailModel(user.email);
+    if (!verifyUser) { throw errorConstructor(422, 'User not exists'); }
 
-    return searchRecipe;
+    const recipeDeleted = await recipesModel.deleteRecipeModel(idRecipe);
+
+    return recipeDeleted;
+
 };
 
 module.exports = {
