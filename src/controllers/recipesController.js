@@ -2,11 +2,11 @@ const recipesService = require('../services/recipesService');
 
 const createRecipeController = async (req, res, next) => {
     try {
-        const recipeData = req.body;
+        const recipeData = req.body; // Recipe
         
-        const { user } = req;   
+        const { _id } = req.user;   // req.user is the user that is logged in
 
-        const recipe = await recipesService.createRecipeService(recipeData, user);
+        const recipe = await recipesService.createRecipeService(recipeData, _id);
 
         return res.status(201).json({ recipe });
     } catch (err) {
@@ -47,21 +47,21 @@ const updateRecipeController = async (req, res, next) => {
     }
 };
 
-// const deleteRecipeController = async (req, res, next) => {
-//     const { id } = req.params;
+const deleteRecipeController = async (req, res, next) => {
+    const { id } = req.params;
 
-//     try {
-//         const deleteRecipe = await recipesService.deleteRecipeService(id);
-//         return res.status(success).json(deleteRecipe);
-//     } catch (err) {
-//         return next(err);
-//     }
-// };
+    try {
+        const deleteRecipe = await recipesService.deleteRecipeService(id);
+        return res.status(200).json(deleteRecipe);
+    } catch (err) {
+        return next(err);
+    }
+};
 
 module.exports = {
     createRecipeController,
     getRecipesController,
     getRecipeIdController,
     updateRecipeController,
-    // deleteRecipeController,
+    deleteRecipeController,
 };

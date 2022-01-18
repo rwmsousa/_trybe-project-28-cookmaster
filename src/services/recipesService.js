@@ -55,22 +55,22 @@ const updateRecipeService = async (userEmail, idRecipe, changesRecipes) => {
     return updatedRecipe;
 };
 
-// const deleteRecipeService = async (id) => {
-//     const searchRecipe = await recipesModel.getRecipeIdModel(id);
-//     if (!searchRecipe) {
-//         throw errorConstructor(unprocessableEntity, 'Wrong recipe ID format');
-//     }
+const deleteRecipeService = async (id) => {
+    const searchRecipe = await recipesModel.getRecipeIdModel(id);
+    if (!searchRecipe) {
+        throw errorConstructor(404, 'Wrong recipe ID format');
+    }
 
-//     const deletedRecipe = await recipesModel.deleteRecipeModel(id, searchRecipe.itensSold);
-//     if (deletedRecipe) { throw errorConstructor(unprocessableEntity, 'Recipe not deleted'); }
+    const deletedRecipe = await recipesModel.deleteRecipeModel(id);
+    if (deletedRecipe) { throw errorConstructor(unprocessableEntity, 'Recipe not deleted'); }
 
-//     return searchRecipe;
-// };
+    return searchRecipe;
+};
 
 module.exports = {
     createRecipeService,
     getRecipesService,
     getRecipeIdService,
     updateRecipeService,
-    // deleteRecipeService,
+    deleteRecipeService,
 };

@@ -49,6 +49,7 @@ const updateRecipeModel = async (idRecipe, changesRecipes, userId) => {
     const recipeUpdated = await db.collection('recipes').findOne({ _id: ObjectId(idRecipe) });
     recipeUpdated.userId = userId;
 
+
     return recipeUpdated;
 };
 

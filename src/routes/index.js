@@ -16,7 +16,7 @@ const {
     getRecipesController,
     getRecipeIdController,
     updateRecipeController,
-    // deleteRecipeController,
+    deleteRecipeController,
 } = require('../controllers/recipesController');
 
 const router = express.Router();
@@ -34,6 +34,6 @@ router.post('/recipes', auth, createRecipeController);
 router.get('/recipes', getRecipesController);
 router.get('/recipes/:id', getRecipeIdController);
 router.put('/recipes/:id', auth, updateRecipeController);
-// router.delete('/recipes/:id', deleteRecipeController);
+router.delete('/recipes/:id', auth, deleteRecipeController);
 
 module.exports = router;
