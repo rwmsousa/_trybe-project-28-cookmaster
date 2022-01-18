@@ -13,8 +13,8 @@ const {
 
 const {
     createRecipeController,
-    // getRecipesController,
-    // getRecipeIdController,
+    getRecipesController,
+    getRecipeIdController,
     // updateRecipeController,
     // deleteRecipeController,
 } = require('../controllers/recipesController');
@@ -31,8 +31,8 @@ router.post('/login', loginController);
 
 // recipes
 router.post('/recipes', auth, createRecipeController);
-// router.get('/recipes', getRecipesController);
-// router.get('/recipes/:id', getRecipeIdController);
+router.get('/recipes', getRecipesController);
+router.get('/recipes/:id', getRecipeIdController);
 // router.put('/recipes/:id', updateRecipeController);
 // router.delete('/recipes/:id', deleteRecipeController);
 

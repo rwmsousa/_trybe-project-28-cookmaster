@@ -22,24 +22,26 @@ const createRecipeService = async (recipeData, user) => {
     return newRecipe;
 };
 
-// const getRecipesService = async () => {
-//     const recipes = await recipesModel.getRecipesModel();
-//     if (recipes.length === 0) {
-//         throw errorConstructor(unprocessableEntity, 'List recipes empty');
-//     }
+const getRecipesService = async () => {
 
-//     return recipes;
-// };
+    const recipes = await recipesModel.getRecipesModel();
+    console.log('RECIPES SERVICE', recipes);
+    if (recipes.length === 0) {
+        throw errorConstructor(422, 'List recipes empty');
+    }
+console.log('passou do if services');
+    return recipes;
+};
 
-// const getRecipeIdService = async (id) => {
-//     const recipe = await recipesModel.getRecipeIdModel(id);
+const getRecipeIdService = async (id) => {
+    const recipe = await recipesModel.getRecipeIdModel(id);
 
-//     if (!recipe) {
-//         throw errorConstructor(notFound, 'Recipe not found');
-//     }
+    if (!recipe) {
+        throw errorConstructor(404, 'recipe not found');
+    }
 
-//     return recipe;
-// };
+    return recipe;
+};
 
 // const updateRecipeService = async (id, itensSold) => {
 //     const exists = await recipesModel.getRecipeIdModel(id);
@@ -73,8 +75,8 @@ const createRecipeService = async (recipeData, user) => {
 
 module.exports = {
     createRecipeService,
-    // getRecipesService,
-    // getRecipeIdService,
+    getRecipesService,
+    getRecipeIdService,
     // updateRecipeService,
     // deleteRecipeService,
 };

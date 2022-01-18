@@ -17,23 +17,24 @@ const createRecipeModel = async (recipeData, user) => {
     return recipeInserted;
 };
 
-// const getRecipesModel = async () => {
-//     const db = await connect();
-//     const recipes = await db.collection('recipes').find().toArray();
+const getRecipesModel = async () => {
+    const db = await connect();
+    
+    const recipes = await db.collection('recipes').find().toArray();
 
-//     return recipes;
-// };
+    return recipes;
+};
 
-// const getRecipeIdModel = async (id) => {
-//     // https: //mongodb.github.io/node-mongodb-native/api-bson-generated/objectid.html#objectid-isvalid
-//     // https: //mongodb.github.io/node-mongodb-native/2.2/api/ObjectID.html
-//     if (!ObjectId.isValid(id)) return null;
+const getRecipeIdModel = async (id) => {
+    // https: //mongodb.github.io/node-mongodb-native/api-bson-generated/objectid.html#objectid-isvalid
+    // https: //mongodb.github.io/node-mongodb-native/2.2/api/ObjectID.html
+    if (!ObjectId.isValid(id)) return null;
 
-//     const db = await connect();
-//     const recipe = await db.collection('recipes').findOne({ _id: ObjectId(id) });
+    const db = await connect();
+    const recipe = await db.collection('recipes').findOne({ _id: ObjectId(id) });
 
-//     return recipe;
-// };
+    return recipe;
+};
 
 // const updateRecipeModel = async (id, userId, quantity) => {
 //     const db = await connect();
@@ -66,8 +67,8 @@ const createRecipeModel = async (recipeData, user) => {
 
 module.exports = {
     createRecipeModel,
-    // getRecipesModel,
-    // getRecipeIdModel,
+    getRecipesModel,
+    getRecipeIdModel,
     // updateRecipeModel,
     // deleteRecipeModel,
 };

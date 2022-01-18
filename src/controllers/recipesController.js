@@ -1,6 +1,4 @@
 const recipesService = require('../services/recipesService');
-const { created } = require('../utils/dictionary/statusCode');
-const { auth } = require('../middlewares/auth');
 
 const createRecipeController = async (req, res, next) => {
     try {
@@ -10,32 +8,33 @@ const createRecipeController = async (req, res, next) => {
 
         const recipe = await recipesService.createRecipeService(recipeData, user);
 
-        return res.status(created).json({ recipe });
+        return res.status(201).json({ recipe });
 
     } catch (err) {
         return next(err);
     }
 };
 
-// const getRecipesController = async (req, res, next) => {
-//     try {
-//         const recipes = await recipesService.getRecipesService();
-//         return res.status(success).json({ recipes });
-//     } catch (err) {
-//         next(err);
-//     }
-// };
+const getRecipesController = async (req, res, next) => {
+    try {
+        const recipes = await recipesService.getRecipesService();
+        return res.status(200).json(recipes);
+        
+    } catch (err) {
+        next(err);
+    }
+};
 
-// const getRecipeIdController = async (req, res, next) => {
-//     const { id } = req.params;
+const getRecipeIdController = async (req, res, next) => {
+    const { id } = req.params;
 
-//     try {
-//         const recipe = await recipesService.getRecipeIdService(id);
-//         return res.status(success).json(recipe);
-//     } catch (err) {
-//         next(err);
-//     }
-// };
+    try {
+        const recipe = await recipesService.getRecipeIdService(id);
+        return res.status(200).json(recipe);
+    } catch (err) {
+        next(err);
+    }
+};
 
 // const updateRecipeController = async (req, res, next) => {
 //     try {
@@ -63,8 +62,8 @@ const createRecipeController = async (req, res, next) => {
 
 module.exports = {
     createRecipeController,
-    // getRecipesController,
-    // getRecipeIdController,
+    getRecipesController,
+    getRecipeIdController,
     // updateRecipeController,
     // deleteRecipeController,
 };
