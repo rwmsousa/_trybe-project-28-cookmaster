@@ -4,13 +4,13 @@ const connect = require('./connection');
 const createRecipeModel = async (recipeData, user) => {
     const db = await connect();
     const { _id } = user;
-    
+
     const recipeInserted = await db.collection('recipes')
         .insertOne(recipeData)
         .then((result) => ({
-            name: result.ops[0].name,
-            ingredients: result.ops[0].ingredients,
-            preparation: result.ops[0].preparation,
+            name: result.ops[ 0 ].name,
+            ingredients: result.ops[ 0 ].ingredients,
+            preparation: result.ops[ 0 ].preparation,
             userId: _id,
             _id: result.insertedId,
         }));
@@ -20,7 +20,7 @@ const createRecipeModel = async (recipeData, user) => {
 
 const getRecipesModel = async () => {
     const db = await connect();
-    
+
     const recipes = await db.collection('recipes').find().toArray();
 
     return recipes;
@@ -37,19 +37,22 @@ const getRecipeIdModel = async (id) => {
     return recipe;
 };
 
-// const updateRecipeModel = async (id, userId, quantity) => {
-//     const db = await connect();
+const updateRecipeModel = async (idRecipe, changesRecipes, userId) => {
+    const db = await connect();
+    const { name, ingredients, preparation } = changesRecipes;
 
-//     await db.collection('recipes')
-//         .updateOne({
-//             _id: ObjectId(id),
-//             'itensSold.userId': userId,
-//         }, { $set: { 'itensSold.$.quantity': quantity } });
 
-//     const recipeUpdated = await db.collection('recipes').findOne({ _id: ObjectId(id) });
+    await db.collection('recipes')
+        .updateOne({
+            _id: ObjectId(idRecipe),
+        }, { $set: { name, ingredients, preparation} });
 
-//     return recipeUpdated;
-// };
+    const recipeUpdated = await db.collection('recipes').findOne({ _id: ObjectId(idRecipe) });
+    recipeUpdated.userId = userId;
+    console.log('recipeUpdated', recipeUpdated);
+
+    return recipeUpdated;
+};
 
 // const deleteRecipeModel = async (id, itensSold) => {
 //     const db = await connect();
@@ -70,7 +73,7 @@ module.exports = {
     createRecipeModel,
     getRecipesModel,
     getRecipeIdModel,
-    // updateRecipeModel,
+    updateRecipeModel,
     // deleteRecipeModel,
 };
 

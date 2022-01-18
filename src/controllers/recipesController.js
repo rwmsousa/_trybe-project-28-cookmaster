@@ -34,18 +34,19 @@ const getRecipeIdController = async (req, res, next) => {
     }
 };
 
-// const updateRecipeController = async (req, res, next) => {
-//     try {
-//         const itemsRecipes = req.body;
-//         const { id } = req.params;
+const updateRecipeController = async (req, res, next) => {
+    try {
+        const { user } = req;  
+        const { id } = req.params;
+        
+        const updatedRecipe = await recipesService.updateRecipeService(user.email, id, req.body);
 
-//         const updatedRecipe = await recipesService.updateRecipeService(id, itemsRecipes);
+        return res.status(200).json(updatedRecipe);
 
-//         return res.status(success).json(updatedRecipe);
-//     } catch (err) {
-//         return next(err);
-//     }
-// };
+    } catch (err) {
+        return next(err);
+    }
+};
 
 // const deleteRecipeController = async (req, res, next) => {
 //     const { id } = req.params;
@@ -62,6 +63,6 @@ module.exports = {
     createRecipeController,
     getRecipesController,
     getRecipeIdController,
-    // updateRecipeController,
+    updateRecipeController,
     // deleteRecipeController,
 };

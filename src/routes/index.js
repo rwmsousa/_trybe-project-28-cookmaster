@@ -15,7 +15,7 @@ const {
     createRecipeController,
     getRecipesController,
     getRecipeIdController,
-    // updateRecipeController,
+    updateRecipeController,
     // deleteRecipeController,
 } = require('../controllers/recipesController');
 
@@ -33,7 +33,7 @@ router.post('/login', loginController);
 router.post('/recipes', auth, createRecipeController);
 router.get('/recipes', getRecipesController);
 router.get('/recipes/:id', getRecipeIdController);
-// router.put('/recipes/:id', updateRecipeController);
+router.put('/recipes/:id', auth, updateRecipeController);
 // router.delete('/recipes/:id', deleteRecipeController);
 
 module.exports = router;

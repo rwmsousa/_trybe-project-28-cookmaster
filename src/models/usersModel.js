@@ -23,7 +23,7 @@ const findUserByEmailModel = async (email) => {
     const db = await connect();
 
     const user = await db.collection('users')
-        .findOne({ email });
+        .findOne({ email }, { projection: { name: 1, email: 1, role: 1, _id: 1 } });
     
     return user;
 };

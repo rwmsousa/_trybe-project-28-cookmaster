@@ -12,7 +12,7 @@ const recipeSchema = Joi.object({
 const createRecipeService = async (recipeData, user) => {
     const { error } = recipeSchema.validate(recipeData);
     if (error) { throw errorConstructor(400, 'Invalid entries. Try again.'); }
-    
+
     const verifyUsers = await usersModel.findUserByEmailModel(user.email);
     if (!verifyUsers) { throw errorConstructor(422, 'User not exists'); }
 
@@ -41,23 +41,18 @@ const getRecipeIdService = async (id) => {
     return recipe;
 };
 
-// const updateRecipeService = async (id, itensSold) => {
-//     const exists = await recipesModel.getRecipeIdModel(id);
-//     if (!exists) {
-//         throw errorConstructor(unprocessableEntity, 'Recipe not exists');
-//     }
+const updateRecipeService = async (userEmail, idRecipe, changesRecipes) => {
+    const exists = await recipesModel.getRecipeIdModel(idRecipe);
+    if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
 
-//     verifyQuantityArrayUsers(itensSold);
+    const verifyUser = await usersModel.findUserByEmailModel(userEmail);
+    console.log('verifyUser', verifyUser);
+    if (!verifyUser) { throw errorConstructor(422, 'User not exists'); }
 
-//     if (itensSold === [] || itensSold === undefined) {
-//         throw errorConstructor(unprocessableEntity, 'Wrong user ID or invalid quantity');
-//     }
+    const updatedRecipe = await recipesModel.updateRecipeModel(idRecipe, changesRecipes, verifyUser._id);
 
-//     const { userId, quantity } = itensSold[0];
-//     const updatedRecipe = await recipesModel.updateRecipeModel(id, userId, quantity);
-
-//     return updatedRecipe;
-// };
+    return updatedRecipe;
+};
 
 // const deleteRecipeService = async (id) => {
 //     const searchRecipe = await recipesModel.getRecipeIdModel(id);
@@ -75,6 +70,6 @@ module.exports = {
     createRecipeService,
     getRecipesService,
     getRecipeIdService,
-    // updateRecipeService,
+    updateRecipeService,
     // deleteRecipeService,
 };
