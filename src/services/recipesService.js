@@ -10,7 +10,6 @@ const recipeSchema = Joi.object({
 });
 
 const createRecipeService = async (recipeData, user) => {
-
     const { error } = recipeSchema.validate(recipeData);
     if (error) { throw errorConstructor(400, 'Invalid entries. Try again.'); }
     
@@ -23,7 +22,6 @@ const createRecipeService = async (recipeData, user) => {
 };
 
 const getRecipesService = async () => {
-
     const recipes = await recipesModel.getRecipesModel();
 
     if (recipes.length === 0) {

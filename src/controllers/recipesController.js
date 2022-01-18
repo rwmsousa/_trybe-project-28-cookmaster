@@ -4,12 +4,11 @@ const createRecipeController = async (req, res, next) => {
     try {
         const recipeData = req.body;
         
-        const user = req.user;   
+        const { user } = req;   
 
         const recipe = await recipesService.createRecipeService(recipeData, user);
 
         return res.status(201).json({ recipe });
-
     } catch (err) {
         return next(err);
     }
@@ -19,7 +18,6 @@ const getRecipesController = async (req, res, next) => {
     try {
         const recipes = await recipesService.getRecipesService();
         return res.status(200).json(recipes);
-        
     } catch (err) {
         next(err);
     }

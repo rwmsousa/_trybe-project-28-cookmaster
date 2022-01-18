@@ -3,14 +3,15 @@ const connect = require('./connection');
 
 const createRecipeModel = async (recipeData, user) => {
     const db = await connect();
-
+    const { _id } = user;
+    
     const recipeInserted = await db.collection('recipes')
         .insertOne(recipeData)
         .then((result) => ({
-            name: result.ops[ 0 ].name,
-            ingredients: result.ops[ 0 ].ingredients,
-            preparation: result.ops[ 0 ].preparation,
-            userId: user._id,
+            name: result.ops[0].name,
+            ingredients: result.ops[0].ingredients,
+            preparation: result.ops[0].preparation,
+            userId: _id,
             _id: result.insertedId,
         }));
 

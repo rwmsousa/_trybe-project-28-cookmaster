@@ -17,7 +17,7 @@ const createUserService = async (user) => {
     const userExists = await usersModel.findUserByEmailModel(email);
     if (userExists) { throw errorConstructor(409, 'Email already registered'); }
     
-    const newUser = await usersModel.createUserModel( user );
+    const newUser = await usersModel.createUserModel(user);
 
     return newUser;
 };
@@ -28,15 +28,14 @@ const loginSchema = Joi.object({
 });
 
 const loginService = async (login) => {
-
     const { error } = loginSchema.validate(login);
     if (error) { throw errorConstructor(401, 'All fields must be filled'); }
     
     const token = await usersModel.tokenGenerateModel(login);
-    if(!token) { throw errorConstructor(401, 'Incorrect username or password'); }
+    if (!token) { throw errorConstructor(401, 'Incorrect username or password'); }
 
     return token;
-}
+};
 
 // const getUsersService = async () => {
 //     const users = await usersModel.getUsersModel();

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+
 const { JWT_SECRET } = process.env;
 
 module.exports = async (req, res, next) => {
@@ -16,10 +17,8 @@ module.exports = async (req, res, next) => {
         req.user = decoded;
         
         return next();
-
     } catch (err) {
         err.status = 401;
-        err.message
         return next(err);
     }
-}
+};
