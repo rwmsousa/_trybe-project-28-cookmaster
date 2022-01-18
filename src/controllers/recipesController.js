@@ -4,7 +4,7 @@ const createRecipeController = async (req, res, next) => {
     try {
         const recipeData = req.body; // Recipe
         
-        const { _id } = req.user;   // req.user is the user that is logged in
+        const { _id } = req.user; // req.user is the user that is logged in
 
         const recipe = await recipesService.createRecipeService(recipeData, _id);
 

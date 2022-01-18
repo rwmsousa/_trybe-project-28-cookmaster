@@ -62,7 +62,7 @@ const deleteRecipeService = async (id) => {
     }
 
     const deletedRecipe = await recipesModel.deleteRecipeModel(id);
-    if (deletedRecipe) { throw errorConstructor(unprocessableEntity, 'Recipe not deleted'); }
+    if (deletedRecipe) { throw errorConstructor(404, 'Recipe not deleted'); }
 
     return searchRecipe;
 };
