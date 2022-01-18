@@ -65,7 +65,6 @@ const deleteRecipeService = async (idRecipe, user) => {
     const recipeDeleted = await recipesModel.deleteRecipeModel(idRecipe);
 
     return recipeDeleted;
-
 };
 
 module.exports = {

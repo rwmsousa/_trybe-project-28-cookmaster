@@ -55,7 +55,6 @@ const deleteRecipeController = async (req, res, next) => {
         const recipeDeleted = await recipesService.deleteRecipeService(id, user);
 
         return res.status(204).json(recipeDeleted);
-        
     } catch (err) {
         return next(err);
     }

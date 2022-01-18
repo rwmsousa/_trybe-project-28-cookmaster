@@ -6,8 +6,8 @@ const createRecipeModel = async (recipeData, user) => {
     const { _id } = user;
 
     const recipeInserted = await db.collection('recipes')
-        .insertOne({...recipeData, userId: _id})
-        .then((result) => result.ops[0])
+        .insertOne({ ...recipeData, userId: _id })
+        .then((result) => result.ops[0]);
 
     return recipeInserted;
 };
