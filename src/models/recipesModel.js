@@ -67,17 +67,6 @@ const insertImageRecipeModel = async (idRecipe, image) => {
     return recipeUpdated;
 };
 
-const getImageRecipeModel = async (idRecipe) => {
-    // const db = await connect();
-
-    const recipe = await getRecipeIdModel(idRecipe);
-    const { image } = recipe;
-    
-    console.log('image', image);
-
-    return image;
-};
-
 module.exports = {
     createRecipeModel,
     getRecipesModel,
@@ -85,7 +74,7 @@ module.exports = {
     updateRecipeModel,
     deleteRecipeModel,
     insertImageRecipeModel,
-    getImageRecipeModel,
+
 };
 
 // SQL: Busca todos os autores do banco.

@@ -76,15 +76,6 @@ const insertImageRecipeService = async (idRecipe, image) => {
     return imageInserted;
 };
 
-const getImageRecipeService = async (idRecipe) => {
-    const exists = await recipesModel.getRecipeIdModel(idRecipe);
-    if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
-
-    const image = await recipesModel.getImageRecipeModel(idRecipe);
-
-    return image;
-};
-
 module.exports = {
     createRecipeService,
     getRecipesService,
@@ -92,5 +83,4 @@ module.exports = {
     updateRecipeService,
     deleteRecipeService,
     insertImageRecipeService,
-    getImageRecipeService,
 };
