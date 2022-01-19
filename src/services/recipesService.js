@@ -65,7 +65,24 @@ const deleteRecipeService = async (idRecipe, user) => {
     const recipeDeleted = await recipesModel.deleteRecipeModel(idRecipe);
 
     return recipeDeleted;
+};
 
+const insertImageRecipeService = async (idRecipe, image) => {
+    const exists = await recipesModel.getRecipeIdModel(idRecipe);
+    if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
+
+    const imageInserted = await recipesModel.insertImageRecipeModel(idRecipe, image);
+
+    return imageInserted;
+};
+
+const getImageRecipeService = async (idRecipe) => {
+    const exists = await recipesModel.getRecipeIdModel(idRecipe);
+    if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
+
+    const image = await recipesModel.getImageRecipeModel(idRecipe);
+
+    return image;
 };
 
 module.exports = {
@@ -74,4 +91,6 @@ module.exports = {
     getRecipeIdService,
     updateRecipeService,
     deleteRecipeService,
+    insertImageRecipeService,
+    getImageRecipeService,
 };

@@ -1,6 +1,6 @@
 const express = require('express');
 
-const auth = require('../middlewares/auth');
+const { auth, multerMiddleware } = require('../middlewares');
 
 const {
     createUserController,
@@ -17,6 +17,8 @@ const {
     getRecipeIdController,
     updateRecipeController,
     deleteRecipeController,
+    insertImageRecipeController,
+    getImageRecipeController,
 } = require('../controllers/recipesController');
 
 const router = express.Router();
@@ -35,5 +37,9 @@ router.get('/recipes', getRecipesController);
 router.get('/recipes/:id', getRecipeIdController);
 router.put('/recipes/:id', auth, updateRecipeController);
 router.delete('/recipes/:id', auth, deleteRecipeController);
+
+// images
+router.put('/recipes/:id/image', auth, multerMiddleware, insertImageRecipeController);
+router.get('/images/:id', getImageRecipeController);
 
 module.exports = router;

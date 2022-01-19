@@ -1,12 +1,14 @@
 const express = require('express');
 require('dotenv').config();
 const bodyParser = require('body-parser');
+const path = require('path');
 const errorMiddleware = require('../middlewares/errorHandler');
 
 const app = express();
 const router = require('../routes');
 
 app.use(bodyParser.json());
+app.use(express.static(path.resolve(__dirname, '/src/uploads')));
 
 // Não remover esse end-point, ele é necessário para o avaliador
 app.get('/', (request, response) => {
