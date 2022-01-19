@@ -1,4 +1,5 @@
 const recipesService = require('../services/recipesService');
+const { HOST, PORT } = process.env;
 
 const createRecipeController = async (req, res, next) => {
     try {
@@ -61,21 +62,17 @@ const deleteRecipeController = async (req, res, next) => {
 };
 
 const insertImageRecipeController = async (req, res, next) => {
-    // console.log('req.file', req.file);
-    // console.log('req.params', req.params)
-   
+    console.log('HAWHEADERS',req.url);
 
- // try {
-    //     const { user } = req;
-    //     const { id } = req.params;
+    try {
+        const image = `${HOST || 'localhost'}:${PORT || 3000}/src/uploads/${ req.file.filename }`;
 
-    //     const recipeDeleted = await recipesService.deleteRecipeService(id, user);
+        const imageInserted = await recipesService.insertImageRecipeService(req.params.id, image);
 
-    //     return res.status(204).json(recipeDeleted);
-    // } catch (err) {
-    //     return next(err);
-    // }
-    res.send('ok');
+        return res.status(200).json(imageInserted);
+    } catch (err) {
+        return next(err);
+    }
 };
 
 module.exports = {

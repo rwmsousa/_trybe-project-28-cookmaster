@@ -36,6 +36,6 @@ router.get('/recipes', getRecipesController);
 router.get('/recipes/:id', getRecipeIdController);
 router.put('/recipes/:id', auth, updateRecipeController);
 router.delete('/recipes/:id', auth, deleteRecipeController);
-router.put('/recipes/:id/image', multerMiddleware, insertImageRecipeController);
+router.put('/recipes/:id/image', auth, multerMiddleware, insertImageRecipeController);
 
 module.exports = router;
