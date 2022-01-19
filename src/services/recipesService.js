@@ -74,7 +74,7 @@ const insertImageRecipeService = async (idRecipe, image) => {
     const imageInserted = await recipesModel.insertImageRecipeModel(idRecipe, image);
 
     return imageInserted;
-}
+};
 
 const getImageRecipeService = async (idRecipe) => {
     const exists = await recipesModel.getRecipeIdModel(idRecipe);
@@ -83,8 +83,7 @@ const getImageRecipeService = async (idRecipe) => {
     const image = await recipesModel.getImageRecipeModel(idRecipe);
 
     return image;
-
-}
+};
 
 module.exports = {
     createRecipeService,
@@ -93,5 +92,5 @@ module.exports = {
     updateRecipeService,
     deleteRecipeService,
     insertImageRecipeService,
-    getImageRecipeService
+    getImageRecipeService,
 };

@@ -1,9 +1,8 @@
 const express = require('express');
 require('dotenv').config();
-const errorMiddleware = require('../middlewares/errorHandler');
 const bodyParser = require('body-parser');
 const path = require('path');
-
+const errorMiddleware = require('../middlewares/errorHandler');
 
 const app = express();
 const router = require('../routes');

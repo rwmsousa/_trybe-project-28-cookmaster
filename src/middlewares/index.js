@@ -5,5 +5,5 @@ const errorHandler = require('./errorHandler');
 module.exports = {
     auth,
     multerMiddleware,
-    errorHandler
+    errorHandler,
 };

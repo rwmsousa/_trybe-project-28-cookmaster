@@ -7,7 +7,7 @@ const createRecipeModel = async (recipeData, user) => {
 
     const recipeInserted = await db.collection('recipes')
         .insertOne({ ...recipeData, userId: _id })
-        .then((result) => result.ops[ 0 ]);
+        .then((result) => result.ops[0]);
 
     return recipeInserted;
 };
@@ -65,10 +65,10 @@ const insertImageRecipeModel = async (idRecipe, image) => {
     const recipeUpdated = await db.collection('recipes').findOne({ _id: ObjectId(idRecipe) });
 
     return recipeUpdated;
-}
+};
 
 const getImageRecipeModel = async (idRecipe) => {
-    const db = await connect();
+    // const db = await connect();
 
     const recipe = await getRecipeIdModel(idRecipe);
     const { image } = recipe;
@@ -76,8 +76,7 @@ const getImageRecipeModel = async (idRecipe) => {
     console.log('image', image);
 
     return image;
-
-}
+};
 
 module.exports = {
     createRecipeModel,

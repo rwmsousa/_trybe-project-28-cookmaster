@@ -1,4 +1,5 @@
 const recipesService = require('../services/recipesService');
+
 const { HOST, PORT } = process.env;
 
 const createRecipeController = async (req, res, next) => {
@@ -63,7 +64,7 @@ const deleteRecipeController = async (req, res, next) => {
 
 const insertImageRecipeController = async (req, res, next) => {
     try {
-        const image = `${ HOST || 'localhost' }:${ PORT || 3000 }/src/uploads/${ req.file.filename }`;
+        const image = `${HOST || 'localhost'}:${PORT || 3000}/src/uploads/${req.file.filename}`;
 
         const imageInserted = await recipesService.insertImageRecipeService(req.params.id, image);
 
@@ -74,7 +75,7 @@ const insertImageRecipeController = async (req, res, next) => {
 };
 
 const getImageRecipeController = async (req, res, next) => {
-    const idRecipe = req.params.id.replace('.jpeg', '')
+    const idRecipe = req.params.id.replace('.jpeg', '');
 
     try {
         const image = await recipesService.getImageRecipeService(idRecipe);
@@ -83,7 +84,7 @@ const getImageRecipeController = async (req, res, next) => {
     } catch (err) {
         return next(err);
     }
-}
+};
 
 module.exports = {
     createRecipeController,
@@ -92,5 +93,5 @@ module.exports = {
     updateRecipeController,
     deleteRecipeController,
     insertImageRecipeController,
-    getImageRecipeController
+    getImageRecipeController,
 };
