@@ -51,7 +51,7 @@ const deleteRecipeController = async (req, res, next) => {
     try {
         const { user } = req;
         const { id } = req.params;
-        
+
         const recipeDeleted = await recipesService.deleteRecipeService(id, user);
 
         return res.status(204).json(recipeDeleted);
@@ -60,10 +60,29 @@ const deleteRecipeController = async (req, res, next) => {
     }
 };
 
+const insertImageRecipeController = async (req, res, next) => {
+    // console.log('req.file', req.file);
+    // console.log('req.params', req.params)
+   
+
+ // try {
+    //     const { user } = req;
+    //     const { id } = req.params;
+
+    //     const recipeDeleted = await recipesService.deleteRecipeService(id, user);
+
+    //     return res.status(204).json(recipeDeleted);
+    // } catch (err) {
+    //     return next(err);
+    // }
+    res.send('ok');
+};
+
 module.exports = {
     createRecipeController,
     getRecipesController,
     getRecipeIdController,
     updateRecipeController,
     deleteRecipeController,
+    insertImageRecipeController
 };
