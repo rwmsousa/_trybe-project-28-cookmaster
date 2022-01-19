@@ -64,7 +64,7 @@ const deleteRecipeController = async (req, res, next) => {
 
 const insertImageRecipeController = async (req, res, next) => {
     try {
-        const image = `${ HOST || 'localhost' }:${ PORT || 3000 }/src/uploads/${ req.file.filename }`;
+        const image = `${HOST || 'localhost'}:${PORT || 3000}/src/uploads/${req.file.filename}`;
 
         const imageInserted = await recipesService.insertImageRecipeService(req.params.id, image);
 
