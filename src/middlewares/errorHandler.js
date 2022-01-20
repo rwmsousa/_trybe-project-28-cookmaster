@@ -1,11 +1,11 @@
 const errorHandler = (err, req, res, _next) => {
     const { message } = err;
+    console.log(err)
     // console.log(message);
-    
+
     if (err.status) {
         return res.status(err.status).json({ message });
     }
-
     return res.status(500).json({ message: 'Internal Server Error' });
 };
 
