@@ -10,7 +10,6 @@ const recipeSchema = Joi.object({
 });
 
 const createRecipeService = async (recipeData, user) => {
-
     const { error } = recipeSchema.validate(recipeData);
     if (error) { throw errorConstructor(400, 'Invalid entries. Try again.'); }
 
@@ -23,7 +22,6 @@ const createRecipeService = async (recipeData, user) => {
 };
 
 const getRecipesService = async () => {
-
     const recipes = await recipesModel.getRecipesModel();
 
     if (recipes.length === 0) { throw errorConstructor(422, 'List recipes empty'); }
@@ -40,7 +38,6 @@ const getRecipeIdService = async (id) => {
 };
 
 const updateRecipeService = async (userEmail, idRecipe, changesRecipes) => {
-    
     const exists = await recipesModel.getRecipeIdModel(idRecipe);
     if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
 
@@ -55,7 +52,6 @@ const updateRecipeService = async (userEmail, idRecipe, changesRecipes) => {
 };
 
 const deleteRecipeService = async (idRecipe, userEmail) => {
-    
     const exists = await recipesModel.getRecipeIdModel(idRecipe);
     if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
 
@@ -68,7 +64,6 @@ const deleteRecipeService = async (idRecipe, userEmail) => {
 };
 
 const insertImageRecipeService = async (idRecipe, image) => {
-    
     const exists = await recipesModel.getRecipeIdModel(idRecipe);
     if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
 

@@ -11,7 +11,6 @@ const createRecipeController = async (req, res, next) => {
         const recipe = await recipesService.createRecipeService(recipeData, user);
 
         return res.status(201).json({ recipe });
-
     } catch (err) {
         return next(err);
     }
@@ -22,7 +21,6 @@ const getRecipesController = async (req, res, next) => {
         const recipes = await recipesService.getRecipesService();
 
         return res.status(200).json(recipes);
-
     } catch (err) {
         next(err);
     }
@@ -35,7 +33,6 @@ const getRecipeIdController = async (req, res, next) => {
         const recipe = await recipesService.getRecipeIdService(id);
         
         return res.status(200).json(recipe);
-        
     } catch (err) {
         next(err);
     }
@@ -49,7 +46,6 @@ const updateRecipeController = async (req, res, next) => {
         const updatedRecipe = await recipesService.updateRecipeService(user.email, id, req.body);
 
         return res.status(200).json(updatedRecipe);
-
     } catch (err) {
         return next(err);
     }
@@ -63,7 +59,6 @@ const deleteRecipeController = async (req, res, next) => {
         const recipeDeleted = await recipesService.deleteRecipeService(id, email);
 
         return res.status(204).json(recipeDeleted);
-        
     } catch (err) {
         return next(err);
     }
@@ -71,12 +66,11 @@ const deleteRecipeController = async (req, res, next) => {
 
 const insertImageRecipeController = async (req, res, next) => {
     try {
-        const image = `${ HOST || 'localhost' }:${ PORT || 3000 }/src/uploads/${ req.file.filename }`;
+        const image = `${HOST || 'localhost'}:${PORT || 3000}/src/uploads/${req.file.filename}`;
 
         const imageInserted = await recipesService.insertImageRecipeService(req.params.id, image);
 
         return res.status(200).json(imageInserted);
-        
     } catch (err) {
         return next(err);
     }

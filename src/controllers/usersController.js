@@ -9,7 +9,6 @@ const createUserController = async (req, res, next) => {
             .createUserService({ email, password, name, role });
 
         return res.status(201).json({ user });
-
     } catch (err) {
         return next(err);
     }
@@ -20,7 +19,6 @@ const loginController = async (req, res, next) => {
         const token = await usersService.loginService(req.body);
 
         return res.status(200).json({ token });
-
     } catch (err) {
         return next(err);
     }

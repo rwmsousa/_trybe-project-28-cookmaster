@@ -28,7 +28,6 @@ const loginSchema = Joi.object({
 });
 
 const loginService = async (login) => {
-    
     const { error } = loginSchema.validate(login);
     if (error) { throw errorConstructor(401, 'All fields must be filled'); }
     
