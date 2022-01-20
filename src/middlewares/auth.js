@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken'); // import jwt module from nodejs
 
-const { JWT_SECRET } = process.env; // import JWT_SECRET from .env file
+const { JWT_SECRET } = process.env || 'secret'; // import JWT_SECRET from .env file
 
 module.exports = async (req, res, next) => {
     const token = req.headers.authorization;
