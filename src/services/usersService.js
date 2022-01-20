@@ -28,6 +28,7 @@ const loginSchema = Joi.object({
 });
 
 const loginService = async (login) => {
+    
     const { error } = loginSchema.validate(login);
     if (error) { throw errorConstructor(401, 'All fields must be filled'); }
     
@@ -53,6 +54,7 @@ const loginService = async (login) => {
 // };
 
 // const updateUserService = async (id, name, quantity) => {
+
 //     const { error } = userSchema.validate({ name, quantity });
 //     if (error || !id) { throw errorConstructor(unprocessableEntity, error.details[0].message); }
 
@@ -66,6 +68,7 @@ const loginService = async (login) => {
 
 // const deleteUserService = async (id) => {
 //     const searchUser = await usersModel.getUserIdModel(id);
+
 //     if (!searchUser) {
 //         throw errorConstructor(unprocessableEntity, 'Wrong id format');
 //     }

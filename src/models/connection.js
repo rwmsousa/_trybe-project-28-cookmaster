@@ -1,8 +1,7 @@
-// connection with mongodb
-const { MongoClient } = require('mongodb');
-require('dotenv').config();
+const { MongoClient } = require('mongodb'); // import MongoClient from mongodb
+require('dotenv').config(); // import .env file
 
-const OPTIONS = {
+const OPTIONS = { 
     useNewUrlParser: true,
     useUnifiedTopology: true,
 };
@@ -20,6 +19,7 @@ const connection = () => (
     }));
 
 module.exports = connection;
+
 
 // connection with mysql2
 // const mysql = require('mysql2/promise');

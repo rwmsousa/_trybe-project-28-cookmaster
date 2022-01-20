@@ -2,7 +2,7 @@
 const jwt = require('jsonwebtoken');
 const connect = require('./connection');
 
-const { JWT_SECRET } = process.env || 'secret';
+const { JWT_SECRET } = process.env || 'secret'; // import JWT_SECRET from .env file
 
 const createUserModel = async (user) => {
     const db = await connect();
@@ -34,6 +34,7 @@ const verifyUsersModel = async (email, password) => {
     const user = await db.collection('users')
         .findOne({ $and: [{ email }, { password }] },
             { projection: { name: 1, email: 1, role: 1, _id: 1 } });
+    
    return { user };
 };
 
@@ -58,7 +59,9 @@ const tokenGenerateModel = async (login) => {
 
 // const getUsersModel = async () => {
 //     const db = await connect();
+
 //     const users = await db.collection('users').find().toArray();
+
 //     return users;
 // };
 
@@ -68,6 +71,7 @@ const tokenGenerateModel = async (login) => {
 //     if (!ObjectId.isValid(id)) return null;
 
 //     const db = await connect();
+
 //     const user = await db.collection('users').findOne({ _id: ObjectId(id) });
 
 //     return user;
@@ -84,6 +88,7 @@ const tokenGenerateModel = async (login) => {
 
 // const deleteUserModel = async (id) => {
 //     const db = await connect();
+
 //     const response = await db.collection('users').deleteOne({ _id: ObjectId(id) });
 
 //     return response;
@@ -106,6 +111,7 @@ module.exports = {
 //     const [users] = await connection.execute(
 //         'SELECT id, first_userName, middle_userName, last_userName FROM model_example.users;',
 //     );
+
 //     return users.map(serialize);
 // };
 

@@ -1,6 +1,6 @@
 const recipesService = require('../services/recipesService');
 
-const { HOST, PORT } = process.env;
+const { HOST, PORT } = process.env; // get HOST and PORT from .env file
 
 const createRecipeController = async (req, res, next) => {
     try {
