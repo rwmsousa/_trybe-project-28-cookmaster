@@ -10,6 +10,7 @@ const recipeSchema = Joi.object({
 });
 
 const createRecipeService = async (recipeData, user) => {
+
     const { error } = recipeSchema.validate(recipeData);
     if (error) { throw errorConstructor(400, 'Invalid entries. Try again.'); }
 
@@ -22,11 +23,10 @@ const createRecipeService = async (recipeData, user) => {
 };
 
 const getRecipesService = async () => {
+
     const recipes = await recipesModel.getRecipesModel();
 
-    if (recipes.length === 0) {
-        throw errorConstructor(422, 'List recipes empty');
-    }
+    if (recipes.length === 0) { throw errorConstructor(422, 'List recipes empty'); }
 
     return recipes;
 };
@@ -34,14 +34,13 @@ const getRecipesService = async () => {
 const getRecipeIdService = async (id) => {
     const recipe = await recipesModel.getRecipeIdModel(id);
 
-    if (!recipe) {
-        throw errorConstructor(404, 'recipe not found');
-    }
+    if (!recipe) { throw errorConstructor(404, 'recipe not found'); }
 
     return recipe;
 };
 
 const updateRecipeService = async (userEmail, idRecipe, changesRecipes) => {
+    
     const exists = await recipesModel.getRecipeIdModel(idRecipe);
     if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
 
@@ -55,11 +54,12 @@ const updateRecipeService = async (userEmail, idRecipe, changesRecipes) => {
     return updatedRecipe;
 };
 
-const deleteRecipeService = async (idRecipe, user) => {
+const deleteRecipeService = async (idRecipe, userEmail) => {
+    
     const exists = await recipesModel.getRecipeIdModel(idRecipe);
     if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
 
-    const verifyUser = await usersModel.findUserByEmailModel(user.email);
+    const verifyUser = await usersModel.findUserByEmailModel(userEmail);
     if (!verifyUser) { throw errorConstructor(422, 'User not exists'); }
 
     const recipeDeleted = await recipesModel.deleteRecipeModel(idRecipe);
@@ -68,6 +68,7 @@ const deleteRecipeService = async (idRecipe, user) => {
 };
 
 const insertImageRecipeService = async (idRecipe, image) => {
+    
     const exists = await recipesModel.getRecipeIdModel(idRecipe);
     if (!exists) { throw errorConstructor(422, 'Recipe not exists'); }
 

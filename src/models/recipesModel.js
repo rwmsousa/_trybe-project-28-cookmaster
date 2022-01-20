@@ -7,7 +7,7 @@ const createRecipeModel = async (recipeData, user) => {
 
     const recipeInserted = await db.collection('recipes')
         .insertOne({ ...recipeData, userId: _id })
-        .then((result) => result.ops[0]);
+        .then((result) => result.ops[ 0 ]);
 
     return recipeInserted;
 };
@@ -26,6 +26,7 @@ const getRecipeIdModel = async (id) => {
     if (!ObjectId.isValid(id)) return null;
 
     const db = await connect();
+
     const recipe = await db.collection('recipes').findOne({ _id: ObjectId(id) });
 
     return recipe;
@@ -33,15 +34,15 @@ const getRecipeIdModel = async (id) => {
 
 const updateRecipeModel = async (idRecipe, changesRecipes, userId) => {
     const db = await connect();
+
     const { name, ingredients, preparation } = changesRecipes;
 
     await db.collection('recipes')
         .updateOne({
             _id: ObjectId(idRecipe),
-        }, { $set: { name, ingredients, preparation } });
+        }, { $set: { name, ingredients, preparation, userId } });
 
     const recipeUpdated = await db.collection('recipes').findOne({ _id: ObjectId(idRecipe) });
-    recipeUpdated.userId = userId;
 
     return recipeUpdated;
 };
@@ -74,7 +75,6 @@ module.exports = {
     updateRecipeModel,
     deleteRecipeModel,
     insertImageRecipeModel,
-
 };
 
 // SQL: Busca todos os autores do banco.
