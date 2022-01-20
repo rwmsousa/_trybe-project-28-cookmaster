@@ -2,7 +2,8 @@
 const jwt = require('jsonwebtoken');
 const connect = require('./connection');
 
-const { JWT_SECRET } = process.env || 'secret'; // import JWT_SECRET from .env file
+// const { JWT_SECRET } = process.env || 'secret'; // import JWT_SECRET from .env file
+const JWT_SECRET = 'secret'; 
 
 const createUserModel = async (user) => {
     const db = await connect();
