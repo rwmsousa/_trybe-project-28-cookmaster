@@ -1,6 +1,6 @@
 const errorHandler = (err, req, res, _next) => {
     const { message } = err;
-    console.log(err)
+    console.log(err);
     // console.log(message);
 
     if (err.status) {
