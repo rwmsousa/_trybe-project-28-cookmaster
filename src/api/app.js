@@ -7,6 +7,7 @@ const { errorHandler } = require('../middlewares'); // import errorHandler - mid
 const app = express(); // create an instance of express
 const router = require('../routes'); // import router from routes
 
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // use body-parser to parse the body of the request
 
 // DON`T REMOVE THIS ENDPOINT. NECESSARY FOR AVALIATOR TRYBE

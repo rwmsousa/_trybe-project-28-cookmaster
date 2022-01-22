@@ -1,105 +1,391 @@
-const { expect } = require('chai');
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
-require('dotenv').config();
-const frisby = require('frisby');
-const usersModel = require('../models/usersModel');
-const usersController = require('../controllers/usersController');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
-const mongoDbUrl = `mongodb://${ process.env.HOST || 'mongodb' }:27017/FakeBank`;
-const url = 'http://localhost:3000';
+const server = require('../api/app');
 
-describe('USERS', () => {
-  describe('Testa a criação de um novo usuário.', () => {
+chai.use(chaiHttp);
 
-    let connection;
-    let db;
+const { expect } = chai;
+
+let newUser = {
+  name: 'jane',
+  email: 'tarzan@gmail.com',
+  password: 'senha123',
+}
+
+describe('POST /users', () => {
+  describe('quando o usuário é criado com sucesso', () => {
+    let response = {};
+    const DBServer = new MongoMemoryServer();
 
     before(async () => {
-      connection = await MongoClient.connect(mongoDbUrl, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-      db = connection.db('FakeBank');
-      await db.collection('users').deleteMany({});
-    });
+      const URLMock = await DBServer.getUri();
+      const connectionMock = await MongoClient.connect(URLMock,
+        { useNewUrlParser: true, useUnifiedTopology: true }
+      );
 
-    beforeEach(async () => {
-      // await db.collection('users').deleteMany({});
-    });
+      sinon.stub(MongoClient, 'connect')
+        .resolves(connectionMock);
 
-    afterEach(async () => {
-      // await db.collection('users').deleteMany({});
+      response = await chai.request(server)
+        .post('/users')
+        .send(newUser);
     });
 
     after(async () => {
-      // await db.collection('users').deleteMany({});
-      await connection.close();
+      MongoClient.connect.restore();
+      await DBServer.stop();
     });
 
-    const payload = {
-      name: 'Wolverine',
-      email: 'logan@gmail.com',
-      password: '123',
-      role: 'user',
-    };
-
-    it('se retorna um objeto', async () => {
-      await frisby.post(`${ url }/users/`, payload)
-      // const response = await usersController.createUserController(payload);
-      const response = await usersModel.createUserModel(payload)
-      expect(response.status).to.be(200);
-      // expect('status', 204)
-      // expect(response).to.be.a('object');
+    it('verifica se retorna o código 201', async () => {
+      expect(response).to.have.status(201);
     });
 
-    //   it('se a resposta retorna os valores corretamente', async () => {
-    //     const response = await usersModel.createProductModel(name, quantity);
-    //     expect(response).to.have.property('_id');
-    //     expect(response._id).to.be.a('object'); //mongo returns an object to _id
-    //     expect(response).to.have.property('name');
-    //     expect(response.name).to.be.a('string');
-    //     expect(response.name).to.be.equal('bicicleta');
-    //     expect(response).to.have.property('quantity');
-    //     expect(response.quantity).to.be.a('number');
-    //     expect(response.quantity).to.be.equal(10);
-    //   });
-    // });
+    it('verifica se retorna um objeto', () => {
+      expect(response.body).to.be.a('object');
+    });
 
-    // describe('Testa a busca de todos os produtos.', () => {
-    //   let connection;
-    //   let db;
+    it('o objeto possui a propriedade "name"', () => {
+      expect(response.body.user).to.have.property('name');
+      expect(response.body.user.name).to.equal('jane');
+    });
 
-    //   before(async () => {
-    //     connection = await MongoClient.connect(mongoDbUrl, {
-    //       useNewUrlParser: true,
-    //       useUnifiedTopology: true,
-    //     });
-    //     db = connection.db('FakeBank');
-    //     await db.collection('users').deleteMany({});
-    //     const myobj = { name: 'Martelo de Thor', quantity: 10 };
-    //     await db.collection('users').insertOne(myobj);
-    //   });
+    it('o objeto possui a propriedade "email"', () => {
+      expect(response.body.user).to.have.property('email');
+      expect(response.body.user.email).to.equal('tarzan@gmail.com');
+    });
 
-    //   beforeEach(async () => {
-    //     // await db.collection('users').deleteMany({});
-    //   });
+    it('o objeto possui a propriedade "role"', () => {
+      expect(response.body.user).to.have.property('role');
+      expect(response.body.user.role).to.equal('user');
+    });
 
-    //   afterEach(async () => {
-    //     // await db.collection('users').deleteMany({});
-    //   });
-
-    //   after(async () => {
-    //     // await db.collection('users').deleteMany({});
-    //     await connection.close();
-    //   });
-
-    //   it('se retorna um array de objetos', async () => {
-    //     const response = await usersModel.getUsersModel();
-    //     expect(response).to.be.a('array');
-    //     expect(response[ 0 ]).to.be.a('object');
-    //     expect(response[ 0 ]).to.have.property('_id');
-    //     expect(response[ 0 ]).to.have.property('name');
-    //     expect(response[ 0 ]).to.have.property('quantity');
-    //   })
+    it('o objeto não possui a propriedade "password"', () => {
+      expect(response.body.user).not.to.have.property('password');
+    });
   });
+
+
+  describe('Quando não existir o campo name', async () => {
+    let response = {};
+    const DBServer = new MongoMemoryServer();
+
+    before(async () => {
+      const URLMock = await DBServer.getUri();
+      const connectionMock = await MongoClient.connect(URLMock,
+        { useNewUrlParser: true, useUnifiedTopology: true }
+      );
+
+      sinon.stub(MongoClient, 'connect')
+        .resolves(connectionMock);
+
+    });
+
+    after(async () => {
+      MongoClient.connect.restore();
+      await DBServer.stop();
+    });
+
+    it('Retorna o código de status 400', async () => {
+      newUser = {
+        email: 'tarzan@gmail.com',
+        password: 'senha123',
+      };
+
+      response = await chai.request(server)
+        .post('/users')
+        .send(newUser);
+      expect(response).to.have.status(400);
+    });
+
+    it('Retorna um objeto', () => {
+      expect(response).to.be.a('object');
+    });
+
+    it('O objeto possui a propriedade "message"', () => {
+      expect(response.body).to.have.property('message');
+    });
+
+    it('Existe uma mensagem "Invalid entries. Try again."', () => {
+      expect(response.body.message).to.equal('Invalid entries. Try again.');
+    });
+  });
+  
+  describe('Quando não existir o campo email', async () => {
+    let response = {};
+    const DBServer = new MongoMemoryServer();
+
+    before(async () => {
+      const URLMock = await DBServer.getUri();
+      const connectionMock = await MongoClient.connect(URLMock,
+        { useNewUrlParser: true, useUnifiedTopology: true }
+      );
+
+      sinon.stub(MongoClient, 'connect')
+        .resolves(connectionMock);
+
+    });
+
+    after(async () => {
+      MongoClient.connect.restore();
+      await DBServer.stop();
+    });
+
+    it('Retorna o código de status 400', async () => {
+      newUser = {
+        name: 'jane',
+        password: 'senha123',
+      };
+
+      response = await chai.request(server)
+        .post('/users')
+        .send(newUser);
+      expect(response).to.have.status(400);
+    });
+
+    it('Retorna um objeto', () => {
+      expect(response).to.be.a('object');
+    });
+
+    it('O objeto possui a propriedade "message"', () => {
+      expect(response.body).to.have.property('message');
+    });
+
+    it('Existe uma mensagem "Invalid entries. Try again."', () => {
+      expect(response.body.message).to.equal('Invalid entries. Try again.');
+    });
+  });
+  
+  describe('Quando não existir o campo password', async () => {
+    let response = {};
+    const DBServer = new MongoMemoryServer();
+
+    before(async () => {
+      const URLMock = await DBServer.getUri();
+      const connectionMock = await MongoClient.connect(URLMock,
+        { useNewUrlParser: true, useUnifiedTopology: true }
+      );
+
+      sinon.stub(MongoClient, 'connect')
+        .resolves(connectionMock);
+
+    });
+
+    after(async () => {
+      MongoClient.connect.restore();
+      await DBServer.stop();
+    });
+
+    it('Retorna o código de status 400', async () => {
+      newUser = {
+        name: 'jane',
+        email: 'tarzan@gmail.com'
+      };
+
+      response = await chai.request(server)
+        .post('/users')
+        .send(newUser);
+      expect(response).to.have.status(400);
+    });
+
+    it('Retorna um objeto', () => {
+      expect(response).to.be.a('object');
+    });
+
+    it('O objeto possui a propriedade "message"', () => {
+      expect(response.body).to.have.property('message');
+    });
+
+    it('Existe uma mensagem "Invalid entries. Try again."', () => {
+      expect(response.body.message).to.equal('Invalid entries. Try again.');
+    });
+  });
+});
+
+
+
+describe('POST /login', () => {
+  describe('quando o login é realizado com sucesso', () => {
+    let response = {};
+    const DBServer = new MongoMemoryServer();
+
+    before(async () => {
+      const URLMock = await DBServer.getUri();
+      const connectionMock = await MongoClient.connect(URLMock,
+        { useNewUrlParser: true, useUnifiedTopology: true }
+      );
+
+      sinon.stub(MongoClient, 'connect')
+        .resolves(connectionMock);
+    });
+
+    after(async () => {
+      MongoClient.connect.restore();
+      await DBServer.stop();
+    });
+
+    it('verifica se retorna o código 201', async () => {
+      let newLogin = {
+  email: 'tarzan@gmail.com',
+  password: 'senha123',
+      }
+      
+       response = await chai.request(server)
+        .post('/login')
+         .send(newLogin);
+      
+      expect(response).to.have.status(200);
+    });
+
+    it('verifica se retorna um objeto', () => {
+      expect(response.body).to.be.a('object');
+    });
+
+    it('verifica se o objeto possui a propriedade "id"', () => {
+      expect(response.body.user).to.have.property('id');
+    });
+
+   it('verifica se o valor "id" é uma string', () => {
+      expect(response.body.user.id).to.be.a('string');
+    });
+  });
+
+
+  // describe('Quando não existir o campo name', async () => {
+  //   let response = {};
+  //   const DBServer = new MongoMemoryServer();
+
+  //   before(async () => {
+  //     const URLMock = await DBServer.getUri();
+  //     const connectionMock = await MongoClient.connect(URLMock,
+  //       { useNewUrlParser: true, useUnifiedTopology: true }
+  //     );
+
+  //     sinon.stub(MongoClient, 'connect')
+  //       .resolves(connectionMock);
+
+  //   });
+
+  //   after(async () => {
+  //     MongoClient.connect.restore();
+  //     await DBServer.stop();
+  //   });
+
+  //   it('Retorna o código de status 400', async () => {
+  //     newUser = {
+  //       email: 'tarzan@gmail.com',
+  //       password: 'senha123',
+  //     };
+
+  //     response = await chai.request(server)
+  //       .post('/users')
+  //       .send(newUser);
+  //     expect(response).to.have.status(400);
+  //   });
+
+  //   it('Retorna um objeto', () => {
+  //     expect(response).to.be.a('object');
+  //   });
+
+  //   it('O objeto possui a propriedade "message"', () => {
+  //     expect(response.body).to.have.property('message');
+  //   });
+
+  //   it('Existe uma mensagem "Invalid entries. Try again."', () => {
+  //     expect(response.body.message).to.equal('Invalid entries. Try again.');
+  //   });
+  // });
+  
+  // describe('Quando não existir o campo email', async () => {
+  //   let response = {};
+  //   const DBServer = new MongoMemoryServer();
+
+  //   before(async () => {
+  //     const URLMock = await DBServer.getUri();
+  //     const connectionMock = await MongoClient.connect(URLMock,
+  //       { useNewUrlParser: true, useUnifiedTopology: true }
+  //     );
+
+  //     sinon.stub(MongoClient, 'connect')
+  //       .resolves(connectionMock);
+
+  //   });
+
+  //   after(async () => {
+  //     MongoClient.connect.restore();
+  //     await DBServer.stop();
+  //   });
+
+  //   it('Retorna o código de status 400', async () => {
+  //     newUser = {
+  //       name: 'jane',
+  //       password: 'senha123',
+  //     };
+
+  //     response = await chai.request(server)
+  //       .post('/users')
+  //       .send(newUser);
+  //     expect(response).to.have.status(400);
+  //   });
+
+  //   it('Retorna um objeto', () => {
+  //     expect(response).to.be.a('object');
+  //   });
+
+  //   it('O objeto possui a propriedade "message"', () => {
+  //     expect(response.body).to.have.property('message');
+  //   });
+
+  //   it('Existe uma mensagem "Invalid entries. Try again."', () => {
+  //     expect(response.body.message).to.equal('Invalid entries. Try again.');
+  //   });
+  // });
+  
+  // describe('Quando não existir o campo password', async () => {
+  //   let response = {};
+  //   const DBServer = new MongoMemoryServer();
+
+  //   before(async () => {
+  //     const URLMock = await DBServer.getUri();
+  //     const connectionMock = await MongoClient.connect(URLMock,
+  //       { useNewUrlParser: true, useUnifiedTopology: true }
+  //     );
+
+  //     sinon.stub(MongoClient, 'connect')
+  //       .resolves(connectionMock);
+
+  //   });
+
+  //   after(async () => {
+  //     MongoClient.connect.restore();
+  //     await DBServer.stop();
+  //   });
+
+  //   it('Retorna o código de status 400', async () => {
+  //     newUser = {
+  //       name: 'jane',
+  //       email: 'tarzan@gmail.com'
+  //     };
+
+  //     response = await chai.request(server)
+  //       .post('/users')
+  //       .send(newUser);
+  //     expect(response).to.have.status(400);
+  //   });
+
+  //   it('Retorna um objeto', () => {
+  //     expect(response).to.be.a('object');
+  //   });
+
+  //   it('O objeto possui a propriedade "message"', () => {
+  //     expect(response.body).to.have.property('message');
+  //   });
+
+  //   it('Existe uma mensagem "Invalid entries. Try again."', () => {
+  //     expect(response.body.message).to.equal('Invalid entries. Try again.');
+  //   });
+  // });
 });
