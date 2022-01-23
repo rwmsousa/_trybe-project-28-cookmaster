@@ -36,7 +36,7 @@ describe('POST /users', () => {
 
     after(async () => {
       MongoClient.connect.restore();
-      await DBServer.stop();
+      // await DBServer.stop();
     });
 
     it('verifica se retorna o código 201', async () => {
