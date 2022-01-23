@@ -3,7 +3,6 @@ const chaiHttp = require('chai-http');
 const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-
 const server = require('../api/app');
 
 chai.use(chaiHttp);
@@ -86,7 +85,7 @@ describe('POST /users', () => {
 
     after(async () => {
       MongoClient.connect.restore();
-      await DBServer.stop();
+      // await DBServer.stop();
     });
 
     it('Retorna o código de status 400', async () => {
@@ -131,7 +130,7 @@ describe('POST /users', () => {
 
     after(async () => {
       MongoClient.connect.restore();
-      await DBServer.stop();
+      // await DBServer.stop();
     });
 
     it('Retorna o código de status 400', async () => {
@@ -176,7 +175,7 @@ describe('POST /users', () => {
 
     after(async () => {
       MongoClient.connect.restore();
-      await DBServer.stop();
+      // await DBServer.stop();
     });
 
     it('Retorna o código de status 400', async () => {
@@ -203,54 +202,4 @@ describe('POST /users', () => {
       expect(response.body.message).to.equal('Invalid entries. Try again.');
     });
   });
-});
-
-describe('POST /login', () => {
-
-  describe('Quando faz o login com sucesso', () => {
-
-    const newUser = {
-      name: 'Caê Calçolari',
-      email: 'caeCalcolari@test.com',
-      password: '123456789',
-    };
-
-    const userToLogin = {
-      email: 'caeCalcolari@test.com',
-      password: '123456789',
-    };
-
-    let response = {};
-    const DBServer = new MongoMemoryServer();
-
-    before(async () => {
-      const URLMock = await DBServer.getUri();
-      const connectionMock = await MongoClient.connect(URLMock,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      );
-
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connectionMock);
-
-      await chai.request(server)
-        .post('/users')
-        .send(newUser);
-
-      response = await chai.request(server)
-        .post('/login')
-        .send(userToLogin);
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      await DBServer.stop();
-    });
-
-    it('Recebe um status 200', (done) => {
-      expect(response).to.have.status(200);
-
-    });
-
-  });
-
 });
