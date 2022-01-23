@@ -10,12 +10,6 @@ chai.use(chaiHttp);
 
 const { expect } = chai;
 
-let newUser = {
-  name: 'jane',
-  email: 'tarzan@gmail.com',
-  password: 'senha123',
-}
-
 describe('POST /users', () => {
   describe('quando o usuário é criado com sucesso', () => {
     let response = {};
@@ -29,6 +23,12 @@ describe('POST /users', () => {
 
       sinon.stub(MongoClient, 'connect')
         .resolves(connectionMock);
+
+      let newUser = {
+        name: 'jane',
+        email: 'tarzan@gmail.com',
+        password: 'senha123',
+      }
 
       response = await chai.request(server)
         .post('/users')
@@ -113,7 +113,7 @@ describe('POST /users', () => {
       expect(response.body.message).to.equal('Invalid entries. Try again.');
     });
   });
-  
+
   describe('Quando não existir o campo email', async () => {
     let response = {};
     const DBServer = new MongoMemoryServer();
@@ -158,7 +158,7 @@ describe('POST /users', () => {
       expect(response.body.message).to.equal('Invalid entries. Try again.');
     });
   });
-  
+
   describe('Quando não existir o campo password', async () => {
     let response = {};
     const DBServer = new MongoMemoryServer();
@@ -205,10 +205,21 @@ describe('POST /users', () => {
   });
 });
 
-
-
 describe('POST /login', () => {
-  describe('quando o login é realizado com sucesso', () => {
+
+  describe('Quando faz o login com sucesso', () => {
+
+    const newUser = {
+      name: 'Caê Calçolari',
+      email: 'caeCalcolari@test.com',
+      password: '123456789',
+    };
+
+    const userToLogin = {
+      email: 'caeCalcolari@test.com',
+      password: '123456789',
+    };
+
     let response = {};
     const DBServer = new MongoMemoryServer();
 
@@ -220,6 +231,14 @@ describe('POST /login', () => {
 
       sinon.stub(MongoClient, 'connect')
         .resolves(connectionMock);
+
+      await chai.request(server)
+        .post('/users')
+        .send(newUser);
+
+      response = await chai.request(server)
+        .post('/login')
+        .send(userToLogin);
     });
 
     after(async () => {
@@ -227,165 +246,11 @@ describe('POST /login', () => {
       await DBServer.stop();
     });
 
-    it('verifica se retorna o código 201', async () => {
-      let newLogin = {
-  email: 'tarzan@gmail.com',
-  password: 'senha123',
-      }
-      
-       response = await chai.request(server)
-        .post('/login')
-         .send(newLogin);
-      
+    it('Recebe um status 200', (done) => {
       expect(response).to.have.status(200);
+
     });
 
-    it('verifica se retorna um objeto', () => {
-      expect(response.body).to.be.a('object');
-    });
-
-    it('verifica se o objeto possui a propriedade "id"', () => {
-      expect(response.body.user).to.have.property('id');
-    });
-
-   it('verifica se o valor "id" é uma string', () => {
-      expect(response.body.user.id).to.be.a('string');
-    });
   });
 
-
-  // describe('Quando não existir o campo name', async () => {
-  //   let response = {};
-  //   const DBServer = new MongoMemoryServer();
-
-  //   before(async () => {
-  //     const URLMock = await DBServer.getUri();
-  //     const connectionMock = await MongoClient.connect(URLMock,
-  //       { useNewUrlParser: true, useUnifiedTopology: true }
-  //     );
-
-  //     sinon.stub(MongoClient, 'connect')
-  //       .resolves(connectionMock);
-
-  //   });
-
-  //   after(async () => {
-  //     MongoClient.connect.restore();
-  //     await DBServer.stop();
-  //   });
-
-  //   it('Retorna o código de status 400', async () => {
-  //     newUser = {
-  //       email: 'tarzan@gmail.com',
-  //       password: 'senha123',
-  //     };
-
-  //     response = await chai.request(server)
-  //       .post('/users')
-  //       .send(newUser);
-  //     expect(response).to.have.status(400);
-  //   });
-
-  //   it('Retorna um objeto', () => {
-  //     expect(response).to.be.a('object');
-  //   });
-
-  //   it('O objeto possui a propriedade "message"', () => {
-  //     expect(response.body).to.have.property('message');
-  //   });
-
-  //   it('Existe uma mensagem "Invalid entries. Try again."', () => {
-  //     expect(response.body.message).to.equal('Invalid entries. Try again.');
-  //   });
-  // });
-  
-  // describe('Quando não existir o campo email', async () => {
-  //   let response = {};
-  //   const DBServer = new MongoMemoryServer();
-
-  //   before(async () => {
-  //     const URLMock = await DBServer.getUri();
-  //     const connectionMock = await MongoClient.connect(URLMock,
-  //       { useNewUrlParser: true, useUnifiedTopology: true }
-  //     );
-
-  //     sinon.stub(MongoClient, 'connect')
-  //       .resolves(connectionMock);
-
-  //   });
-
-  //   after(async () => {
-  //     MongoClient.connect.restore();
-  //     await DBServer.stop();
-  //   });
-
-  //   it('Retorna o código de status 400', async () => {
-  //     newUser = {
-  //       name: 'jane',
-  //       password: 'senha123',
-  //     };
-
-  //     response = await chai.request(server)
-  //       .post('/users')
-  //       .send(newUser);
-  //     expect(response).to.have.status(400);
-  //   });
-
-  //   it('Retorna um objeto', () => {
-  //     expect(response).to.be.a('object');
-  //   });
-
-  //   it('O objeto possui a propriedade "message"', () => {
-  //     expect(response.body).to.have.property('message');
-  //   });
-
-  //   it('Existe uma mensagem "Invalid entries. Try again."', () => {
-  //     expect(response.body.message).to.equal('Invalid entries. Try again.');
-  //   });
-  // });
-  
-  // describe('Quando não existir o campo password', async () => {
-  //   let response = {};
-  //   const DBServer = new MongoMemoryServer();
-
-  //   before(async () => {
-  //     const URLMock = await DBServer.getUri();
-  //     const connectionMock = await MongoClient.connect(URLMock,
-  //       { useNewUrlParser: true, useUnifiedTopology: true }
-  //     );
-
-  //     sinon.stub(MongoClient, 'connect')
-  //       .resolves(connectionMock);
-
-  //   });
-
-  //   after(async () => {
-  //     MongoClient.connect.restore();
-  //     await DBServer.stop();
-  //   });
-
-  //   it('Retorna o código de status 400', async () => {
-  //     newUser = {
-  //       name: 'jane',
-  //       email: 'tarzan@gmail.com'
-  //     };
-
-  //     response = await chai.request(server)
-  //       .post('/users')
-  //       .send(newUser);
-  //     expect(response).to.have.status(400);
-  //   });
-
-  //   it('Retorna um objeto', () => {
-  //     expect(response).to.be.a('object');
-  //   });
-
-  //   it('O objeto possui a propriedade "message"', () => {
-  //     expect(response.body).to.have.property('message');
-  //   });
-
-  //   it('Existe uma mensagem "Invalid entries. Try again."', () => {
-  //     expect(response.body.message).to.equal('Invalid entries. Try again.');
-  //   });
-  // });
 });
