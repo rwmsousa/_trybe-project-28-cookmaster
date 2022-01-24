@@ -5,6 +5,7 @@ const { auth, multerMiddleware } = require('../middlewares'); // import auth and
 const {
     createUserController,
     loginController,
+    createAdminController,
     // getUsersController,
     // getUserIdController,
     // updateUserController,
@@ -23,6 +24,7 @@ const {
 const router = express.Router(); // create an instance of express.Router()
 
 // Routes for users
+router.post('/users/admin', auth, createAdminController);
 router.post('/users', createUserController);
 router.post('/login', loginController);
 // router.get('/users', getUsersController);
