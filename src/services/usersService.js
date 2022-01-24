@@ -42,7 +42,7 @@ const loginService = async (login) => {
 
 const verifyAdminService = async (token) => {
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log('decoded', decoded);
+
     if (decoded.role !== 'admin') {
         throw errorConstructor(403, 'Only admins can register new admins');
     }

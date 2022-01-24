@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('POST /users', () => {
-  describe('quando o usuário é criado com sucesso', () => {
+  describe('Quando o usuário é criado com sucesso', () => {
     let response = {};
     const DBServer = new MongoMemoryServer();
 
@@ -67,7 +67,6 @@ describe('POST /users', () => {
     });
   });
 
-
   describe('Quando não existir o campo name', async () => {
     let response = {};
     const DBServer = new MongoMemoryServer();
@@ -80,7 +79,6 @@ describe('POST /users', () => {
 
       sinon.stub(MongoClient, 'connect')
         .resolves(connectionMock);
-
     });
 
     after(async () => {
@@ -170,7 +168,6 @@ describe('POST /users', () => {
 
       sinon.stub(MongoClient, 'connect')
         .resolves(connectionMock);
-
     });
 
     after(async () => {
@@ -201,5 +198,59 @@ describe('POST /users', () => {
     it('Existe uma mensagem "Invalid entries. Try again."', () => {
       expect(response.body.message).to.equal('Invalid entries. Try again.');
     });
+  });
+
+  describe('Quando o email já existir', async () => {
+    let response = {};
+    const DBServer = new MongoMemoryServer();
+
+    before(async () => {
+      const URLMock = await DBServer.getUri();
+      const connectionMock = await MongoClient.connect(URLMock,
+        { useNewUrlParser: true, useUnifiedTopology: true }
+      );
+
+      sinon.stub(MongoClient, 'connect')
+        .resolves(connectionMock);
+    });
+
+    after(async () => {
+      MongoClient.connect.restore();
+      // await DBServer.stop();
+    });
+
+    // let newUser = {
+    //   name: 'jane',
+    //   email: 'tarzan@gmail.com',
+    //   password: 'senha123',
+    // }
+
+    // response = await chai.request(server)
+    //   .post('/users')
+    //   .send(newUser);
+
+    it('Retorna o código de status 409', async () => {
+      let newUser2 = {
+        name: 'jane',
+        email: 'tarzan@gmail.com',
+        password: 'senha123',
+      }
+
+      response = await chai.request(server)
+        .post('/users')
+        .send(newUser2);
+      expect(response).to.have.status(409);
+    });
+    
+    it('Retorna um objeto', () => {
+      expect(response).to.be.a('object');
+    });
+    it('O objeto possui a propriedade "message"', () => {
+      expect(response.body).to.have.property('message');
+    });
+    it('Existe uma mensagem "Email already exists."', () => {
+      expect(response.body.message).to.equal('Email already registered');
+    });
+
   });
 });
