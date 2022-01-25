@@ -1,17 +1,38 @@
-
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const server = require('../api/app');
-
-chai.use(chaiHttp);
+const connectionMock = require('./connectionMock');
 
 const { expect } = chai;
 
 describe('POST /login', () => {
-  describe('Quando faz o login com sucesso', () => {
+  let db;
+
+  before(async () => {
+    connection = await connectionMock();
+
+    sinon.stub(MongoClient, 'connect')
+      .resolves(connection);
+
+    db = connection.db('Cookmaster')
+    chai.use(chaiHttp);
+  });
+
+  beforeEach(async () => {
+    await db.collection('users').deleteMany({});
+  });
+
+  afterEach(async () => {
+    await db.collection('users').deleteMany({});
+  });
+
+  after(async () => {
+    MongoClient.connect.restore();
+  });
+
+  it('Quando faz o login com sucesso', async() => {
 
     let newUser = {
       name: 'jane',
@@ -24,88 +45,39 @@ describe('POST /login', () => {
       password: 'senha123',
     }
 
-    let response = {};
-    const DBServer = new MongoMemoryServer();
+    await chai.request(server)
+      .post('/users')
+      .send(newUser);
 
-    before(async () => {
-      const URLMock = await DBServer.getUri();
-      const connectionMock = await MongoClient.connect(URLMock,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      );
+    const response = await chai.request(server)
+      .post('/login')
+      .send(newLogin);
 
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connectionMock);
-
-      await chai.request(server)
-        .post('/users')
-        .send(newUser);
-
-      response = await chai.request(server)
-        .post('/login')
-        .send(newLogin);
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      // await DBServer.stop(); 
-    });
-
-    it('Recebe um status 200', async () => {
-      expect(response).to.have.status(200)
-    });
-
-    it('Existe uma propriedade "token"', () => {
-      expect(response.body).to.have.property('token');
-    });
+    expect(response).to.have.status(200)
+    expect(response.body).to.have.property('token');
   });
 
-  describe('Quando algum campo não é informado e não faz o login com sucesso', () => {
+  it('Quando algum campo não é informado e não faz o login com sucesso', async() => {
 
     let newLogin = {
       email: 'jane',
       password: 'senha123',
     }
 
-    let response = {};
-    const DBServer = new MongoMemoryServer();
+    await chai.request(server)
+      .post('/users')
+      .send(newUser);
 
-    before(async () => {
-      const URLMock = await DBServer.getUri();
-      const connectionMock = await MongoClient.connect(URLMock,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      );
+    const response = await chai.request(server)
+      .post('/login')
+      .send(newLogin);
 
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connectionMock);
-
-      await chai.request(server)
-        .post('/users')
-        .send(newUser);
-
-      response = await chai.request(server)
-        .post('/login')
-        .send(newLogin);
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      // await DBServer.stop(); 
-    });
-
-    it('Retorna um status 401', async () => {
-      expect(response).to.have.status(401);
-    });
-
-    it('Existe uma propriedade "message"', () => {
-      expect(response.body).to.have.property("message");
-    })
-
-    it('Retorna uma mensagem "Incorrect username or password"', () => {
-      expect(response.body.message).to.equal('All fields must be filled');
-    });
+    expect(response).to.have.status(401);
+    expect(response.body).to.have.property("message");
+    expect(response.body.message).to.equal('All fields must be filled');
   });
 
-  describe('Quando os campos e-mail ou senha estão incorretos', () => {
+  it('Quando os campos e-mail ou senha estão incorretos', async() => {
 
     let newUser = {
       name: 'jane',
@@ -118,39 +90,15 @@ describe('POST /login', () => {
       password: 'correee',
     }
 
-    let response = {};
-    const DBServer = new MongoMemoryServer();
+    await chai.request(server)
+      .post('/users')
+      .send(newUser);
 
-    before(async () => {
-      const URLMock = await DBServer.getUri();
-      const connectionMock = await MongoClient.connect(URLMock,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      );
+    const response = await chai.request(server)
+      .post('/login')
+      .send(newLogin);
 
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connectionMock);
-
-      await chai.request(server)
-        .post('/users')
-        .send(newUser);
-
-      response = await chai.request(server)
-        .post('/login')
-        .send(newLogin);
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      // await DBServer.stop(); 
-    });
-
-    it('Retorna um status 401', async () => {
-      expect(response).to.have.status(401);
-    });
-
-    it('Retorna a mensagem de erro "Incorrect username or password"', () => {
-      expect(response.body.message).to.equal('Incorrect username or password');
-    });
-
+    expect(response).to.have.status(401);
+    expect(response.body.message).to.equal('Incorrect username or password');
   });
 });
