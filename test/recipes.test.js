@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const mongoDbUrl = `mongodb://${process.env.HOST || 'mongodb'}:27017/Cookmaster`;
+const mongoDbUrl = `mongodb://${ process.env.HOST || 'mongodb' }:27017/Cookmaster`;
 const url = 'http://localhost:3000';
 
 describe('3 - Crie um endpoint para o cadastro de receitas', () => {
@@ -40,7 +40,7 @@ describe('3 - Crie um endpoint para o cadastro de receitas', () => {
 
   it('Será validado que não é possível cadastrar receita sem o campo "name"', async () => {
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -57,7 +57,7 @@ describe('3 - Crie um endpoint para o cadastro de receitas', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             ingredients: 'Frango',
             preparation: '10 min no forno',
           })
@@ -71,7 +71,7 @@ describe('3 - Crie um endpoint para o cadastro de receitas', () => {
 
   it('Será validado que não é possível cadastrar receita sem o campo "preparation"', async () => {
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -88,7 +88,7 @@ describe('3 - Crie um endpoint para o cadastro de receitas', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Frango assado',
             ingredients: 'Frango',
           })
@@ -102,7 +102,7 @@ describe('3 - Crie um endpoint para o cadastro de receitas', () => {
 
   it('Será validado que não é possível cadastrar receita sem o campo "ingredients"', async () => {
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -119,7 +119,7 @@ describe('3 - Crie um endpoint para o cadastro de receitas', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Frango assado',
             preparation: '10 min no forno',
           })
@@ -141,7 +141,7 @@ describe('3 - Crie um endpoint para o cadastro de receitas', () => {
           },
         },
       })
-      .post(`${url}/recipes`, {
+      .post(`${ url }/recipes`, {
         name: 'Frango do jacquin',
         ingredients: 'Frango',
         preparation: '10 min no forno',
@@ -155,7 +155,7 @@ describe('3 - Crie um endpoint para o cadastro de receitas', () => {
 
   it('Será validado que é possível cadastrar uma receita com sucesso', async () => {
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -163,16 +163,15 @@ describe('3 - Crie um endpoint para o cadastro de receitas', () => {
       .then((response) => {
         const { body } = response;
         const result = JSON.parse(body);
-        return frisby
-          .setup({
-            request: {
-              headers: {
-                Authorization: result.token,
-                'Content-Type': 'application/json',
-              },
+        return frisby.setup({
+          request: {
+            headers: {
+              Authorization: result.token,
+              'Content-Type': 'application/json',
             },
-          })
-          .post(`${url}/recipes`, {
+          },
+        })
+          .post(`${ url }/recipes`, {
             name: 'Frango do jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -230,14 +229,14 @@ describe('4 - Crie um endpoint para a listagem de receitas', () => {
 
   it('Será validado que é possível listar todas as receitas sem estar autenticado', async () => {
     await frisby
-      .get(`${url}/recipes/`)
+      .get(`${ url }/recipes/`)
       .expect('status', 200)
       .then((response) => {
         const { body } = response;
         const result = JSON.parse(body);
-        expect(result[0].name).toBe('banana caramelizada');
-        expect(result[0].ingredients).toBe('banana, açúcar');
-        expect(result[0].preparation).toBe(
+        expect(result[ 0 ].name).toBe('banana caramelizada');
+        expect(result[ 0 ].ingredients).toBe('banana, açúcar');
+        expect(result[ 0 ].preparation).toBe(
           'coloque o açúcar na frigideira até virar caramelo e jogue a banana',
         );
       });
@@ -245,7 +244,7 @@ describe('4 - Crie um endpoint para a listagem de receitas', () => {
 
   it('Será validado que é possível listar todas as receitas estando autenticado', async () => {
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -262,7 +261,7 @@ describe('4 - Crie um endpoint para a listagem de receitas', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -271,7 +270,7 @@ describe('4 - Crie um endpoint para a listagem de receitas', () => {
       });
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -288,18 +287,18 @@ describe('4 - Crie um endpoint para a listagem de receitas', () => {
               },
             },
           })
-          .get(`${url}/recipes/`)
+          .get(`${ url }/recipes/`)
           .expect('status', 200)
           .then((responseRecipes) => {
             const { json } = responseRecipes;
-            expect(json[0].name).toBe('banana caramelizada');
-            expect(json[0].ingredients).toBe('banana, açúcar');
-            expect(json[0].preparation).toBe(
+            expect(json[ 0 ].name).toBe('banana caramelizada');
+            expect(json[ 0 ].ingredients).toBe('banana, açúcar');
+            expect(json[ 0 ].preparation).toBe(
               'coloque o açúcar na frigideira até virar caramelo e jogue a banana',
             );
-            expect(json[1].name).toBe('Receita de frango do Jacquin');
-            expect(json[1].ingredients).toBe('Frango');
-            expect(json[1].preparation).toBe('10 min no forno');
+            expect(json[ 1 ].name).toBe('Receita de frango do Jacquin');
+            expect(json[ 1 ].ingredients).toBe('Frango');
+            expect(json[ 1 ].preparation).toBe('10 min no forno');
           });
       });
   });
@@ -348,7 +347,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
     let resultRecipe;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -365,7 +364,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -378,7 +377,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
       });
 
     await frisby
-      .get(`${url}/recipes/${resultRecipe.recipe._id}`)
+      .get(`${ url }/recipes/${ resultRecipe.recipe._id }`)
       .expect('status', 200)
       .then((response) => {
         const { body } = response;
@@ -394,7 +393,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
     let resultRecipe;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -411,7 +410,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -424,7 +423,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
       });
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -441,7 +440,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
               },
             },
           })
-          .get(`${url}/recipes/${resultRecipe.recipe._id}`)
+          .get(`${ url }/recipes/${ resultRecipe.recipe._id }`)
           .expect('status', 200)
           .then((responseRecipes) => {
             const { json } = responseRecipes;
@@ -455,7 +454,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
 
   it('Será validado que não é possível listar uma receita que não existe', async () => {
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -472,7 +471,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -481,7 +480,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
       });
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -498,7 +497,7 @@ describe('5 - Crie um endpoint para visualizar uma receita específica', () => {
               },
             },
           })
-          .get(`${url}/recipes/999`)
+          .get(`${ url }/recipes/999`)
           .expect('status', 404)
           .then((responseRecipes) => {
             const { json } = responseRecipes;
@@ -551,7 +550,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
     let resultRecipes;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -568,7 +567,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -581,7 +580,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
       });
 
     await frisby
-      .put(`${url}/recipes/${resultRecipes.recipe._id}`, {
+      .put(`${ url }/recipes/${ resultRecipes.recipe._id }`, {
         name: 'Receita de frango do Jacquin editado',
         ingredients: 'Frango editado',
         preparation: '10 min no forno editado',
@@ -598,7 +597,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
     let resultRecipes;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -615,7 +614,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -636,7 +635,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
           },
         },
       })
-      .put(`${url}/recipes/${resultRecipes.recipe._id}`, {
+      .put(`${ url }/recipes/${ resultRecipes.recipe._id }`, {
         name: 'Receita de frango do Jacquin editado',
         ingredients: 'Frango editado',
         preparation: '10 min no forno editado',
@@ -654,7 +653,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
     let resultRecipes;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -671,7 +670,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -692,7 +691,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
           },
         },
       })
-      .put(`${url}/recipes/${resultRecipes.recipe._id}`, {
+      .put(`${ url }/recipes/${ resultRecipes.recipe._id }`, {
         name: 'Receita de frango do Jacquin editado',
         ingredients: 'Frango editado',
         preparation: '10 min no forno editado',
@@ -714,7 +713,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
     let resultAdmin;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -731,7 +730,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -744,7 +743,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
       });
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'root@email.com',
         password: 'admin',
       })
@@ -763,7 +762,7 @@ describe('7 - Crie um endpoint para a edição de uma receita', () => {
           },
         },
       })
-      .put(`${url}/recipes/${resultRecipes.recipe._id}`, {
+      .put(`${ url }/recipes/${ resultRecipes.recipe._id }`, {
         name: 'Receita de frango do Jacquin editado',
         ingredients: 'Frango editado',
         preparation: '10 min no forno editado',
@@ -824,7 +823,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
     let resultRecipes;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -841,7 +840,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -854,7 +853,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
       });
 
     await frisby
-      .delete(`${url}/recipes/${resultRecipes.recipe._id}`)
+      .delete(`${ url }/recipes/${ resultRecipes.recipe._id }`)
       .expect('status', 401)
       .then((response) => {
         const { body } = response;
@@ -868,7 +867,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
     let resultRecipes;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -885,7 +884,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -906,7 +905,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
           },
         },
       })
-      .delete(`${url}/recipes/${resultRecipes.recipe._id}`)
+      .delete(`${ url }/recipes/${ resultRecipes.recipe._id }`)
       .expect('status', 204);
   });
 
@@ -915,7 +914,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
     let resultAdmin;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -932,7 +931,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -945,7 +944,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
       });
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'root@email.com',
         password: 'admin',
       })
@@ -964,7 +963,7 @@ describe('8 - Crie um endpoint para a exclusão de uma receita', () => {
           },
         },
       })
-      .delete(`${url}/recipes/${resultRecipes.recipe._id}`)
+      .delete(`${ url }/recipes/${ resultRecipes.recipe._id }`)
       .expect('status', 204);
   });
 });
@@ -1019,7 +1018,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
     let resultRecipes;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -1036,7 +1035,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -1057,7 +1056,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
           },
         },
       })
-      .put(`${url}/recipes/${resultRecipes.recipe._id}/image`, { body: formData })
+      .put(`${ url }/recipes/${ resultRecipes.recipe._id }/image`, { body: formData })
       .expect('status', 200);
   });
 
@@ -1072,7 +1071,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
     let resultRecipes;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -1089,7 +1088,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -1110,12 +1109,12 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
           },
         },
       })
-      .put(`${url}/recipes/${resultRecipes.recipe._id}/image`, { body: formData })
+      .put(`${ url }/recipes/${ resultRecipes.recipe._id }/image`, { body: formData })
       .expect('status', 200)
       .then((response) => {
         const { body } = response;
         result = JSON.parse(body);
-        expect(result.image).toBe(`localhost:3000/src/uploads/${resultRecipes.recipe._id}.jpeg`);
+        expect(result.image).toBe(`localhost:3000/src/uploads/${ resultRecipes.recipe._id }.jpeg`);
         expect(result).toHaveProperty('_id');
         expect(result).toHaveProperty('userId');
         expect(result).toHaveProperty('name');
@@ -1135,7 +1134,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
     let resultRecipes;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -1152,7 +1151,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -1165,7 +1164,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
       });
 
     await frisby
-      .put(`${url}/recipes/${resultRecipes.recipe._id}/image`, { body: formData })
+      .put(`${ url }/recipes/${ resultRecipes.recipe._id }/image`, { body: formData })
       .expect('status', 401);
   });
 
@@ -1181,7 +1180,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
     let resultAdmin;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -1198,7 +1197,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -1211,7 +1210,7 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
       });
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'root@email.com',
         password: 'admin',
       })
@@ -1230,12 +1229,12 @@ describe('9 - Crie um endpoint para a adição de uma imagem a uma receita', () 
           },
         },
       })
-      .put(`${url}/recipes/${resultRecipes.recipe._id}/image`, { body: formData })
+      .put(`${ url }/recipes/${ resultRecipes.recipe._id }/image`, { body: formData })
       .expect('status', 200)
       .then((response) => {
         const { body } = response;
         result = JSON.parse(body);
-        expect(result.image).toBe(`localhost:3000/src/uploads/${resultRecipes.recipe._id}.jpeg`);
+        expect(result.image).toBe(`localhost:3000/src/uploads/${ resultRecipes.recipe._id }.jpeg`);
         expect(result).toHaveProperty('_id');
         expect(result).toHaveProperty('userId');
         expect(result).toHaveProperty('name');
@@ -1295,7 +1294,7 @@ describe('10 - Crie um endpoint para acessar a imagem de uma receita', () => {
     let resultRecipes;
 
     await frisby
-      .post(`${url}/login/`, {
+      .post(`${ url }/login/`, {
         email: 'erickjacquin@gmail.com',
         password: '12345678',
       })
@@ -1312,7 +1311,7 @@ describe('10 - Crie um endpoint para acessar a imagem de uma receita', () => {
               },
             },
           })
-          .post(`${url}/recipes`, {
+          .post(`${ url }/recipes`, {
             name: 'Receita de frango do Jacquin',
             ingredients: 'Frango',
             preparation: '10 min no forno',
@@ -1333,7 +1332,7 @@ describe('10 - Crie um endpoint para acessar a imagem de uma receita', () => {
           },
         },
       })
-      .put(`${url}/recipes/${resultRecipes.recipe._id}/image`, { body: formData })
+      .put(`${ url }/recipes/${ resultRecipes.recipe._id }/image`, { body: formData })
       .expect('status', 200);
 
 
@@ -1346,12 +1345,12 @@ describe('10 - Crie um endpoint para acessar a imagem de uma receita', () => {
           },
         },
       })
-      .get(`${url}/images/${resultRecipes.recipe._id}.jpeg`)
+      .get(`${ url }/images/${ resultRecipes.recipe._id }.jpeg`)
       .expect('status', 200)
       .then((response) => {
         const { headers } = response;
-        const symbol = Object.getOwnPropertySymbols(headers)[0]
-        const contentType = headers[symbol]['content-type'][0]
+        const symbol = Object.getOwnPropertySymbols(headers)[ 0 ]
+        const contentType = headers[ symbol ][ 'content-type' ][ 0 ]
         expect(contentType).toBe('image/jpeg')
 
       });
