@@ -32,7 +32,6 @@ describe('POST /users', () => {
 
   after(async () => {
     MongoClient.connect.restore();
-    // await DBServer.stop();
   });
 
   describe('Quando o usuário é criado com sucesso', async () => {
@@ -184,7 +183,7 @@ describe('POST /users', () => {
       .send(newUser);
 
     it('Retorna o código de status 409', async () => {
-      expect(response).to.have.status(408);
+      expect(response).to.have.status(409);
     });
 
     it('Retorna um objeto', () => {
@@ -202,13 +201,13 @@ describe('POST /users', () => {
 
   describe('Quando o usuário ADMIN é criado com sucesso', () => {
 
-    it('verifica se retorna corretamente o usuário ADMIN cadastrado', async () => {
+    it('verifica se retorna corretamente o usuário ADMIN cadastrado com sucesso', async () => {
 
       const userAdmin = {
         name: 'admin', email: 'root@email.com', password: 'admin', role: 'admin'
       };
-      await db.collection('users').insertOne(userAdmin);
 
+      await db.collection('users').insertOne(userAdmin);
 
       let newLogin = { email: 'root@email.com', password: 'admin' };
 
@@ -232,6 +231,7 @@ describe('POST /users', () => {
         .send(newUser)
         .then((responseLogin) => {
           const { body } = responseLogin;
+
           expect(body).to.be.a('object');
           expect(body.user).to.have.property('name');
           expect(body.user.name).to.equal('King Kong');
@@ -243,10 +243,47 @@ describe('POST /users', () => {
           expect(body.user).not.to.have.property('password');
         });
     });
+
+    it('verifica se retorna erro ao tentar cadastrar um novo admin, com usuário logado sem credenciais de admin', async () => {
+
+      const user = {
+        name: 'Maria', email: 'maria@email.com', password: 'user', role: 'user'
+      };
+      
+      await db.collection('users').insertOne(user);
+
+      let newLogin = { email: 'maria@email.com', password: 'user' };
+
+      let newUser = {
+        name: 'King Kong',
+        email: 'kingkong@gmail.com',
+        password: '123',
+      }
+
+      const token = await chai.request(server)
+        .post('/login').send(newLogin)
+        .then((response) => {
+          const { body } = response;
+          console.log('body', body);
+
+          return body.token;
+        })
+
+      chai.request(server)
+        .post('/users/admin')
+        .set('Authorization', token)
+        .send(newUser)
+        .then((responseLogin) => {
+          console.log('responseLogin', responseLogin);
+          const { body } = responseLogin;
+
+          expect(body).to.be.a('object');
+          expect(body).to.have.property('message');
+          expect(body.message).to.equal('Only admins can register new admins');
+        });
+    });
   });
 });
 
 
-              // expect(json).to.have.property('message');
-              // expect(json.message).to.equal('Email already registered');
 
