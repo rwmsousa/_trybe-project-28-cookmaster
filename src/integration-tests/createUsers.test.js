@@ -3,46 +3,53 @@ const chaiHttp = require('chai-http');
 const frisby = require('frisby');
 const sinon = require('sinon');
 const { MongoClient } = require('mongodb');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const server = require('../api/server');
+const server = require('../api/app');
 const connectionMock = require('./connectionMock');
 
-chai.use(chaiHttp);
 
 const { expect } = chai;
 
 describe('POST /users', () => {
-  
-  
-  
-  describe.skip('Quando o usuário é criado com sucesso', () => {
+  let db;
+
+  before(async () => {
+    connection = await connectionMock();
+
+    sinon.stub(MongoClient, 'connect')
+      .resolves(connection);
+
+    db = connection.db('Cookmaster')
+    chai.use(chaiHttp);
+  });
+
+  beforeEach(async () => {
+    await db.collection('users').deleteMany({});
+  });
+
+  afterEach(async () => {
+    await db.collection('users').deleteMany({});
+  });
+
+  after(async () => {
+    MongoClient.connect.restore();
+    // await DBServer.stop();
+  });
+
+  describe('Quando o usuário é criado com sucesso', async () => {
     let response = {};
-    const DBServer = new MongoMemoryServer();
+
+    let newUser = {
+      name: 'jane',
+      email: 'tarzan@gmail.com',
+      password: 'senha123',
+    }
 
     before(async () => {
-      const URLMock = await DBServer.getUri();
-      const connectionMock = await MongoClient.connect(URLMock,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      );
-
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connectionMock);
-
-      let newUser = {
-        name: 'jane',
-        email: 'tarzan@gmail.com',
-        password: 'senha123',
-      }
 
       response = await chai.request(server)
         .post('/users')
         .send(newUser);
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      // await DBServer.stop();
-    });
+    })
 
     it('verifica se retorna o código 201', async () => {
       expect(response).to.have.status(201);
@@ -76,34 +83,19 @@ describe('POST /users', () => {
     });
   });
 
-  describe.skip('Quando não existir o campo name', async () => {
+  describe('Quando não existir o campo name', async () => {
     let response = {};
-    const DBServer = new MongoMemoryServer();
 
-    before(async () => {
-      const URLMock = await DBServer.getUri();
-      const connectionMock = await MongoClient.connect(URLMock,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      );
+    newUser = {
+      email: 'tarzan@gmail.com',
+      password: 'senha123',
+    };
 
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connectionMock);
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      // await DBServer.stop();
-    });
+    response = await chai.request(server)
+      .post('/users')
+      .send(newUser);
 
     it('Retorna o código de status 400', async () => {
-      newUser = {
-        email: 'tarzan@gmail.com',
-        password: 'senha123',
-      };
-
-      response = await chai.request(server)
-        .post('/users')
-        .send(newUser);
       expect(response).to.have.status(400);
     });
 
@@ -120,35 +112,19 @@ describe('POST /users', () => {
     });
   });
 
-  describe.skip('Quando não existir o campo email', async () => {
+  describe('Quando não existir o campo email', async () => {
     let response = {};
-    const DBServer = new MongoMemoryServer();
 
-    before(async () => {
-      const URLMock = await DBServer.getUri();
-      const connectionMock = await MongoClient.connect(URLMock,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      );
+    newUser = {
+      name: 'jane',
+      password: 'senha123',
+    };
 
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connectionMock);
-
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      // await DBServer.stop();
-    });
+    response = await chai.request(server)
+      .post('/users')
+      .send(newUser);
 
     it('Retorna o código de status 400', async () => {
-      newUser = {
-        name: 'jane',
-        password: 'senha123',
-      };
-
-      response = await chai.request(server)
-        .post('/users')
-        .send(newUser);
       expect(response).to.have.status(400);
     });
 
@@ -165,34 +141,19 @@ describe('POST /users', () => {
     });
   });
 
-  describe.skip('Quando não existir o campo password', async () => {
+  describe('Quando não existir o campo password', async () => {
     let response = {};
-    const DBServer = new MongoMemoryServer();
 
-    before(async () => {
-      const URLMock = await DBServer.getUri();
-      const connectionMock = await MongoClient.connect(URLMock,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      );
+    newUser = {
+      name: 'jane',
+      email: 'tarzan@gmail.com'
+    };
 
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connectionMock);
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      // await DBServer.stop();
-    });
+    response = await chai.request(server)
+      .post('/users')
+      .send(newUser);
 
     it('Retorna o código de status 400', async () => {
-      newUser = {
-        name: 'jane',
-        email: 'tarzan@gmail.com'
-      };
-
-      response = await chai.request(server)
-        .post('/users')
-        .send(newUser);
       expect(response).to.have.status(400);
     });
 
@@ -211,91 +172,44 @@ describe('POST /users', () => {
 
   describe('Quando o email já existir', async () => {
     let response = {};
-    const DBServer = new MongoMemoryServer();
 
-    before(async () => {
-      const URLMock = await DBServer.getUri();
-      const connectionMock = await MongoClient.connect(URLMock,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-      );
+    let newUser = {
+      name: 'jane',
+      email: 'tarzan@gmail.com',
+      password: 'senha123',
+    }
 
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connectionMock);
-    });
-
-    after(async () => {
-      MongoClient.connect.restore();
-      // await DBServer.stop();
-    });
+    response = await chai.request(server)
+      .post('/users')
+      .send(newUser);
 
     it('Retorna o código de status 409', async () => {
-      let newUser2 = {
-        name: 'jane',
-        email: 'tarzan@gmail.com',
-        password: 'senha123',
-      }
-
-      response = await chai.request(server)
-        .post('/users')
-        .send(newUser2);
-      expect(response).to.have.status(409);
+      expect(response).to.have.status(408);
     });
 
     it('Retorna um objeto', () => {
       expect(response).to.be.a('object');
     });
+
     it('O objeto possui a propriedade "message"', () => {
       expect(response.body).to.have.property('message');
     });
+
     it('Existe uma mensagem "Email already exists."', () => {
       expect(response.body.message).to.equal('Email already registered');
     });
-
   });
+
   describe('Quando o usuário ADMIN é criado com sucesso', () => {
-    // let connectionMock;
-    let db;
-    // const DBServer = new MongoMemoryServer();
 
-    // before(async () => {
-    //   const URLMock = await DBServer.getUri();
-    //   connectionMock = MongoClient.connect(URLMock, {
-    //     useNewUrlParser: true,
-    //     useUnifiedTopology: true,
-    //   });
-    //   db = connectionMock.db('Cookmaster');
-
-    //   sinon.stub(MongoClient, 'connect')
-    //     .resolves(connectionMock);
-    // });
-
-    before(async () => {
-      const connection = await connectionMock();
-
-      sinon.stub(MongoClient, 'connect')
-        .resolves(connection);
-
-      db = connection.db('Cookmaster');
-    });
-
-
-    beforeEach(async () => {
-      await db.collection('users').deleteMany({});
+    it('verifica se retorna corretamente o usuário ADMIN cadastrado', async () => {
 
       const userAdmin = {
         name: 'admin', email: 'root@email.com', password: 'admin', role: 'admin'
       };
-
       await db.collection('users').insertOne(userAdmin);
-    });
 
-    after(async () => {
-      MongoClient.connect.restore();
-      // await DBServer.stop();
-    });
 
-    it('verifica se retorna corretamente o usuário ADMIN cadastrado', async () => {
-      const url = 'http://localhost:3000';
       let newLogin = { email: 'root@email.com', password: 'admin' };
 
       let newUser = {
@@ -304,39 +218,34 @@ describe('POST /users', () => {
         password: '123',
       }
 
-      await frisby
-        .post(`${ url }/login/`, newLogin)
-        .expect('status', 200)
+      const token = await chai.request(server)
+        .post('/login').send(newLogin)
         .then((response) => {
           const { body } = response;
-          const result = JSON.parse(body);
-          return frisby.setup({
-            request: {
-              headers: {
-                Authorization: result.token,
-                'Content-Type': 'application/json',
-              },
-            },
-          })
-            .post(`${ url }/users/admin`, newUser)
-            .then((responseLogin) => {
-              const { json } = responseLogin;
-              console.log('json', json);
 
-              expect(json).to.be.a('object');
-              expect(json.user).to.have.property('name');
-              expect(json.user.name).to.equal('King Kong');
-              expect(json.user).to.have.property('email');
-              expect(json.user.email).to.equal('kingkong@gmail.com');
-              expect(json.user).to.have.property('role');
-              expect(json.user.role).to.equal('admin');
-              expect(json.user).to.have.property('_id');
-              expect(json.user).not.to.have.property('password');
-            });
+          return body.token;
+        })
+
+      chai.request(server)
+        .post('/users/admin')
+        .set('Authorization', token)
+        .send(newUser)
+        .then((responseLogin) => {
+          const { body } = responseLogin;
+          expect(body).to.be.a('object');
+          expect(body.user).to.have.property('name');
+          expect(body.user.name).to.equal('King Kong');
+          expect(body.user).to.have.property('email');
+          expect(body.user.email).to.equal('kingkong@gmail.com');
+          expect(body.user).to.have.property('role');
+          expect(body.user.role).to.equal('admin');
+          expect(body.user).to.have.property('_id');
+          expect(body.user).not.to.have.property('password');
         });
     });
   });
 });
+
 
               // expect(json).to.have.property('message');
               // expect(json.message).to.equal('Email already registered');
