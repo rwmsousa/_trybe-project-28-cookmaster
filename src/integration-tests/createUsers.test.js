@@ -24,6 +24,12 @@ describe('POST /users', () => {
 
   beforeEach(async () => {
     await db.collection('users').deleteMany({});
+    let newUser = {
+      name: 'jane',
+      email: 'tarzan@gmail.com',
+      password: 'senha123',
+    }
+    await db.collection('users').insertOne(newUser);
   });
 
   afterEach(async () => {
@@ -35,171 +41,117 @@ describe('POST /users', () => {
   });
 
   describe('Quando o usuário é criado com sucesso', async () => {
-    let response = {};
 
-    let newUser = {
-      name: 'jane',
-      email: 'tarzan@gmail.com',
-      password: 'senha123',
-    }
+    it('Retorna as informações do usuário com os campos obrigatórios', async () => {
 
-    before(async () => {
+      const john = {
+        name: 'john',
+        email: 'john@gmail.com',
+        password: 'senha123',
+      }
 
-      response = await chai.request(server)
+      const response = await chai.request(server)
         .post('/users')
-        .send(newUser);
-    })
+        .send(john)
+        .then((response) => response);
+      console.log(response.body);
 
-    it('verifica se retorna o código 201', async () => {
       expect(response).to.have.status(201);
-    });
-
-    it('verifica se retorna um objeto', () => {
       expect(response.body).to.be.a('object');
-    });
-
-    it('o objeto possui a propriedade "name"', () => {
       expect(response.body.user).to.have.property('name');
-      expect(response.body.user.name).to.equal('jane');
-    });
-
-    it('o objeto possui a propriedade "email"', () => {
-      expect(response.body.user).to.have.property('email');
-      expect(response.body.user.email).to.equal('tarzan@gmail.com');
-    });
-
-    it('o objeto possui a propriedade "role"', () => {
+      expect(response.body.user.name).to.equal('john');
       expect(response.body.user).to.have.property('role');
       expect(response.body.user.role).to.equal('user');
-    });
-
-    it('o objeto possui a propriedade "_id"', () => {
+      expect(response.body.user).to.have.property('email');
+      expect(response.body.user.email).to.equal('john@gmail.com');
       expect(response.body.user).to.have.property('_id');
-    });
-
-    it('o objeto não possui a propriedade "password"', () => {
       expect(response.body.user).not.to.have.property('password');
     });
   });
 
   describe('Quando não existir o campo name', async () => {
-    let response = {};
 
-    newUser = {
-      email: 'tarzan@gmail.com',
-      password: 'senha123',
-    };
+    it('Retorna mensagem de erro com o código de status 400', async () => {
 
-    response = await chai.request(server)
-      .post('/users')
-      .send(newUser);
+      newUser = {
+        email: 'tarzan@gmail.com',
+        password: 'senha123',
+      };
 
-    it('Retorna o código de status 400', async () => {
+      const response = await chai.request(server)
+        .post('/users')
+        .send(newUser)
+        .then((response) => response);
+
       expect(response).to.have.status(400);
-    });
-
-    it('Retorna um objeto', () => {
       expect(response).to.be.a('object');
-    });
-
-    it('O objeto possui a propriedade "message"', () => {
       expect(response.body).to.have.property('message');
-    });
-
-    it('Existe uma mensagem "Invalid entries. Try again."', () => {
       expect(response.body.message).to.equal('Invalid entries. Try again.');
     });
   });
 
   describe('Quando não existir o campo email', async () => {
-    let response = {};
 
-    newUser = {
-      name: 'jane',
-      password: 'senha123',
-    };
+    it('Retorna mensagem de erro com o código de status 400', async () => {
 
-    response = await chai.request(server)
-      .post('/users')
-      .send(newUser);
+      newUser = {
+        name: 'jane',
+        password: 'senha123',
+      };
 
-    it('Retorna o código de status 400', async () => {
+      const response = await chai.request(server)
+        .post('/users')
+        .send(newUser)
+        .then((response) => response);
+
       expect(response).to.have.status(400);
-    });
-
-    it('Retorna um objeto', () => {
       expect(response).to.be.a('object');
-    });
-
-    it('O objeto possui a propriedade "message"', () => {
       expect(response.body).to.have.property('message');
-    });
-
-    it('Existe uma mensagem "Invalid entries. Try again."', () => {
       expect(response.body.message).to.equal('Invalid entries. Try again.');
     });
   });
 
   describe('Quando não existir o campo password', async () => {
-    let response = {};
 
-    newUser = {
-      name: 'jane',
-      email: 'tarzan@gmail.com'
-    };
+    it('Retorna mensagem de erro com o código de status 400', async () => {
+      newUser = {
+        name: 'jane',
+        email: 'tarzan@gmail.com'
+      };
 
-    response = await chai.request(server)
-      .post('/users')
-      .send(newUser);
+      const response = await chai.request(server)
+        .post('/users')
+        .send(newUser)
+        .then((response) => response);
 
-    it('Retorna o código de status 400', async () => {
       expect(response).to.have.status(400);
-    });
-
-    it('Retorna um objeto', () => {
       expect(response).to.be.a('object');
-    });
-
-    it('O objeto possui a propriedade "message"', () => {
       expect(response.body).to.have.property('message');
-    });
-
-    it('Existe uma mensagem "Invalid entries. Try again."', () => {
       expect(response.body.message).to.equal('Invalid entries. Try again.');
     });
   });
 
   describe('Quando o email já existir', async () => {
-    let response = {};
 
-    let newUser = {
-      name: 'jane',
-      email: 'tarzan@gmail.com',
-      password: 'senha123',
-    }
+    it('Retorna mensagem de erro com o código de status 409', async () => {
+      let newUser = {
+        name: 'jane',
+        email: 'tarzan@gmail.com',
+        password: 'senha123',
+      }
 
-    response = await chai.request(server)
-      .post('/users')
-      .send(newUser);
-
-    it('Retorna o código de status 409', async () => {
+      const response = await chai.request(server)
+        .post('/users')
+        .send(newUser)
+        .then((response) => response);
       expect(response).to.have.status(409);
-    });
-
-    it('Retorna um objeto', () => {
       expect(response).to.be.a('object');
-    });
-
-    it('O objeto possui a propriedade "message"', () => {
       expect(response.body).to.have.property('message');
-    });
-
-    it('Existe uma mensagem "Email already exists."', () => {
       expect(response.body.message).to.equal('Email already registered');
     });
   });
 
-  describe('Quando o usuário ADMIN é criado com sucesso', () => {
+  describe('Verifica se o usuário ADMIN é criado com sucesso', () => {
 
     it('verifica se retorna corretamente o usuário ADMIN cadastrado com sucesso', async () => {
 
@@ -225,23 +177,21 @@ describe('POST /users', () => {
           return body.token;
         })
 
-      chai.request(server)
+      const { body } = await chai.request(server)
         .post('/users/admin')
         .set('Authorization', token)
         .send(newUser)
-        .then((responseLogin) => {
-          const { body } = responseLogin;
+        .then((responseLogin) => responseLogin);
 
-          expect(body).to.be.a('object');
-          expect(body.user).to.have.property('name');
-          expect(body.user.name).to.equal('King Kong');
-          expect(body.user).to.have.property('email');
-          expect(body.user.email).to.equal('kingkong@gmail.com');
-          expect(body.user).to.have.property('role');
-          expect(body.user.role).to.equal('admin');
-          expect(body.user).to.have.property('_id');
-          expect(body.user).not.to.have.property('password');
-        });
+      expect(body).to.be.a('object');
+      expect(body.user).to.have.property('name');
+      expect(body.user.name).to.equal('King Kong');
+      expect(body.user).to.have.property('email');
+      expect(body.user.email).to.equal('kingkong@gmail.com');
+      expect(body.user).to.have.property('role');
+      expect(body.user.role).to.equal('admin');
+      expect(body.user).to.have.property('_id');
+      expect(body.user).not.to.have.property('password');
     });
 
     it('verifica se retorna erro ao tentar cadastrar um novo admin, com usuário logado sem credenciais de admin', async () => {
@@ -249,7 +199,7 @@ describe('POST /users', () => {
       const user = {
         name: 'Maria', email: 'maria@email.com', password: 'user', role: 'user'
       };
-      
+
       await db.collection('users').insertOne(user);
 
       let newLogin = { email: 'maria@email.com', password: 'user' };
@@ -264,23 +214,19 @@ describe('POST /users', () => {
         .post('/login').send(newLogin)
         .then((response) => {
           const { body } = response;
-          console.log('body', body);
 
           return body.token;
         })
 
-      chai.request(server)
+      const { body } = await chai.request(server)
         .post('/users/admin')
         .set('Authorization', token)
         .send(newUser)
-        .then((responseLogin) => {
-          console.log('responseLogin', responseLogin);
-          const { body } = responseLogin;
+        .then((responseLogin) => responseLogin);
 
-          expect(body).to.be.a('object');
-          expect(body).to.have.property('message');
-          expect(body.message).to.equal('Only admins can register new admins');
-        });
+      expect(body).to.be.a('object');
+      expect(body).to.have.property('message');
+      expect(body.message).to.equal('Only admins can register new admins');
     });
   });
 });
