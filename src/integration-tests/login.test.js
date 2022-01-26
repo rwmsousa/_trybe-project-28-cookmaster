@@ -16,7 +16,7 @@ describe('POST /login', () => {
     sinon.stub(MongoClient, 'connect')
       .resolves(connection);
 
-    db = connection.db('Cookmaster')
+    db = connection.db('Cookmaster');
     chai.use(chaiHttp);
   });
 
@@ -32,6 +32,15 @@ describe('POST /login', () => {
     MongoClient.connect.restore();
   });
 
+  it('Verifica se a conexão com o Cookmaster é realizada com sucesso', async () => {
+    const response = await chai.request(server)
+      .get('/');
+
+    expect(db.namespace).to.equal('Cookmaster');
+    expect(response).to.be.status(200);
+    
+  });
+  
   it('Quando faz o login com sucesso', async() => {
 
     let newUser = {
@@ -59,18 +68,12 @@ describe('POST /login', () => {
 
   it('Quando algum campo não é informado e não faz o login com sucesso', async() => {
 
-    let newLogin = {
-      email: 'jane',
-      password: 'senha123',
-    }
-
     await chai.request(server)
       .post('/users')
-      .send(newUser);
+      .send({});
 
     const response = await chai.request(server)
       .post('/login')
-      .send(newLogin);
 
     expect(response).to.have.status(401);
     expect(response.body).to.have.property("message");

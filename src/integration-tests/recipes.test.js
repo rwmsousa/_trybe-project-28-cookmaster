@@ -246,6 +246,40 @@ describe('POST /recipes', () => {
     expect(recipes.body.length).to.not.equal(0);
   });
 
+  it('Retorna erro ao buscar todas as receitas quando não há receitas cadastradas', async () => {
+
+    const newUser = {
+      name: 'Tarzan',
+      email: 'tarzan@gmail.com',
+      password: 'senha123',
+    }
+
+    db.collection('users').insertOne(newUser);
+
+    const newLogin = {
+      email: 'tarzan@gmail.com',
+      password: 'senha123',
+    }
+
+    const token = await chai.request(server)
+      .post('/login')
+      .send(newLogin)
+      .then((response) => {
+        const { body } = response;
+
+        return body.token;
+      })
+
+    const recipes = await chai.request(server)
+      .get('/recipes')
+      .then((response) => response);
+
+    expect(recipes).to.have.status(422);
+    expect(recipes.body).to.be.a('object');
+    expect(recipes.body).to.have.property('message');
+    expect(recipes.body.message).to.equal('List recipes empty');
+  });
+
   it('Verifica se BUSCA uma receita específica PELO ID', async () => {
 
     const newUser = {
@@ -380,7 +414,6 @@ describe('POST /recipes', () => {
       .set('authorization', token)
       .send(recipe1)
       .then((response) => response);
-    console.log('_ID', response.body.recipe._id);
 
     const recipe2 = {
       name: "suco de maçã",
@@ -403,7 +436,7 @@ describe('POST /recipes', () => {
       .then((response) => response);
 
     const findRecipe = recipes.body.find(recipe => recipe._id === response.body.recipe._id);
-    
+
     expect(findRecipe).to.be.undefined;
     expect(recipes.body.length).to.equal(1);
   });

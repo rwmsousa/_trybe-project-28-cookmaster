@@ -207,6 +207,25 @@ describe('POST /users', () => {
     expect(body).to.have.property('message');
     expect(body.message).to.equal('Only admins can register new admins');
   });
+  
+  it('verifica se retorna erro ao tentar fazer login sem um token na requisição', async () => {
+
+    let newUser = {
+      name: 'King Kong',
+      email: 'kingkong@gmail.com',
+      password: '123',
+    }
+
+    const { body } = await chai.request(server)
+      .post('/users/admin')
+      .set('Authorization','')
+      .send(newUser)
+      .then((responseLogin) => responseLogin);
+
+    expect(body).to.be.a('object');
+    expect(body).to.have.property('message');
+    expect(body.message).to.equal('missing auth token');
+  });
 });
 
 
