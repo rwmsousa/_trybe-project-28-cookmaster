@@ -13,9 +13,6 @@ const createRecipeService = async (recipeData, user) => {
     const { error } = recipeSchema.validate(recipeData);
     if (error) { throw errorConstructor(400, 'Invalid entries. Try again.'); }
 
-    const verifyUsers = await usersModel.findUserByEmailModel(user.email);
-    if (!verifyUsers) { throw errorConstructor(422, 'User not exists'); }
-
     const newRecipe = await recipesModel.createRecipeModel(recipeData, user);
 
     return newRecipe;
