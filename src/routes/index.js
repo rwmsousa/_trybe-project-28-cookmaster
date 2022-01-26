@@ -5,11 +5,7 @@ const { auth, multerMiddleware } = require('../middlewares'); // import auth and
 const {
     createUserController,
     loginController,
-    createAdminController,
-    // getUsersController,
-    // getUserIdController,
-    // updateUserController,
-    // deleteUserController,
+    createAdminController
 } = require('../controllers/usersController'); // import usersController
 
 const {
@@ -27,10 +23,6 @@ const router = express.Router(); // create an instance of express.Router()
 router.post('/users/admin', auth, createAdminController);
 router.post('/users', createUserController);
 router.post('/login', loginController);
-// router.get('/users', getUsersController);
-// router.get('/users/:id', getUserIdController);
-// router.put('/users/:id', updateUserController);
-// router.delete('/users/:id', deleteUserController);
 
 // Routes for recipes
 router.post('/recipes', auth, createRecipeController);
