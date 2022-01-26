@@ -1,6 +1,7 @@
 const recipesService = require('../services/recipesService');
 
-const { HOST, PORT } = process.env; // get HOST and PORT from .env file
+const HOST = process.env.HOST || 'localhost'; // get HOST from .env file
+const PORT = process.env.PORT || 3000; // get PORT from .env file
 
 const createRecipeController = async (req, res, next) => {
     try {
@@ -66,7 +67,7 @@ const deleteRecipeController = async (req, res, next) => {
 
 const insertImageRecipeController = async (req, res, next) => {
     try {
-        const image = `${HOST || 'localhost'}:${PORT || 3000}/src/uploads/${req.file.filename}`;
+        const image = `${HOST}:${PORT}/src/uploads/${req.file.filename}`;
 
         const imageInserted = await recipesService.insertImageRecipeService(req.params.id, image);
 

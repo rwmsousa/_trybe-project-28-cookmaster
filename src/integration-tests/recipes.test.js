@@ -5,6 +5,11 @@ const { MongoClient } = require('mongodb');
 const server = require('../api/app');
 const connectionMock = require('./connectionMock');
 
+const fs = require('fs');
+
+const HOST = process.env.HOST || 'localhost'; // get HOST from .env file
+const PORT = process.env.PORT || 3000; // get PORT from .env file
+
 const { expect } = chai;
 
 describe('POST /recipes', () => {
@@ -325,7 +330,7 @@ describe('POST /recipes', () => {
     expect(recipes.body.preparation).to.equal('Bater tudo no liquidificador');
   });
 
-  it('Verifica se é possível ALTERAR nova RECEITA', async () => {
+  it('Verifica se é possível ALTERAR RECEITA', async () => {
 
     const newUser = {
       name: 'Tarzan',
@@ -377,6 +382,57 @@ describe('POST /recipes', () => {
     expect(responseUpdate.body.name).to.equal('suco de uva');
     expect(responseUpdate.body.ingredients).to.equal('uva e água');
     expect(responseUpdate.body.preparation).to.equal('Bater tudo no liquidificador');
+  });
+
+  it('Verifica se é possível ADICIONAR IMAGEM RECEITA', async () => {
+
+    const newUser = {
+      name: 'Tarzan',
+      email: 'tarzan@gmail.com',
+      password: 'senha123',
+    }
+
+    db.collection('users').insertOne(newUser);
+
+    const newLogin = {
+      email: 'tarzan@gmail.com',
+      password: 'senha123',
+    }
+
+    const token = await chai.request(server)
+      .post('/login')
+      .send(newLogin)
+      .then((response) => {
+        const { body } = response;
+
+        return body.token;
+      })
+
+    const recipe = {
+      name: "suco de maçã",
+      ingredients: "maçã e água",
+      preparation: "Bater tudo no liquidificador",
+    };
+
+    const response = await chai.request(server)
+      .post('/recipes')
+      .set('authorization', token)
+      .send(recipe)
+      .then((response) => response.body.recipe._id);
+
+    const responseUpdate = await chai.request(server)
+      .put(`/recipes/${ response}/image`)
+      .set('authorization', token)
+      .set('content-type', 'multipart/form-data')
+      .attach('image', fs.readFileSync(`${__dirname}/ratinho.jpg`), 'uploads/ratinho.jpg')
+      .then((response) => response);
+
+    expect(responseUpdate).to.have.status(200);
+    expect(responseUpdate.body.name).to.equal('suco de maçã');
+    expect(responseUpdate.body.ingredients).to.equal('maçã e água');
+    expect(responseUpdate.body.preparation).to.equal('Bater tudo no liquidificador');
+    expect(responseUpdate.body).to.have.a.property('image');
+    expect(responseUpdate.body.image).to.equal(`${HOST}:${PORT}/src/uploads/${response}.jpeg`);
   });
 
   it('Verifica se EXLUI uma receita específica PELO ID', async () => {
